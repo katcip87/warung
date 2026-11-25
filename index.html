@@ -1,0 +1,2717 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kas, Eceran & Scan Barcode</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --income: #15803d;
+      --income-soft: #dcfce7;
+      --expense: #b91c1c;
+      --expense-soft: #fee2e2;
+      --warn: #b45309;
+      --warn-soft: #fef3c7;
+      --accent: #0f172a;
+      --accent-hover: #1e293b;
+      --radius: 12px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+
+      --zone-meta-bg: #eff6ff;
+      --zone-meta-border: #bfdbfe;
+      --zone-item-bg: #f0fdf4;
+      --zone-item-border: #bbf7d0;
+      --zone-price-bg: #fffbeb;
+      --zone-price-border: #fde68a;
+      --zone-extra-bg: #f5f3ff;
+      --zone-extra-border: #ddd6fe;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      padding: 12px;
+    }
+
+    .app {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .login-card {
+      max-width: 420px;
+      margin: 28px auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .login-sub {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 12px;
+    }
+
+    .auth-tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 7px 8px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 8px;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 6px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+      margin-bottom: 12px;
+      z-index: 50;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: #cbd5e1;
+      padding: 8px 4px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-btn.active {
+      background: #ffffff;
+      color: var(--accent);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .date-badge-line {
+      font-size: 0.74rem;
+      color: var(--muted);
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .sub-card {
+      border-radius: 10px;
+      padding: 10px 11px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+    }
+
+    .sub-card-meta {
+      background: var(--zone-meta-bg);
+      border-color: var(--zone-meta-border);
+    }
+
+    .sub-card-item {
+      background: var(--zone-item-bg);
+      border-color: var(--zone-item-border);
+    }
+
+    .sub-card-price {
+      background: var(--zone-price-bg);
+      border-color: var(--zone-price-border);
+    }
+
+    .sub-card-extra {
+      background: var(--zone-extra-bg);
+      border-color: var(--zone-extra-border);
+    }
+
+    .period-toggle {
+      display: inline-flex;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .period-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .period-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-box {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 8px;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .stat-val {
+      font-size: 0.85rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .income-text { color: var(--income); }
+    .expense-text { color: var(--expense); }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-income {
+      background: var(--income);
+      color: #ffffff;
+    }
+
+    .btn-expense {
+      background: var(--expense);
+      color: #ffffff;
+    }
+
+    .btn-dark {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-dark:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-plus {
+      width: 100%;
+      margin-top: 8px;
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .btn-plus:hover {
+      background: #15803d;
+    }
+
+    .btn-scan {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-scan:hover {
+      background: #0369a1;
+    }
+
+    .btn-sm {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-sm:hover {
+      background: var(--surface-alt);
+    }
+
+    .brand-sub {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    input[readonly] {
+      background: rgba(255, 255, 255, 0.75);
+      font-weight: 800;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(15, 23, 42, 0.15);
+      border-color: var(--accent);
+    }
+
+    .scanner-box {
+      background: #ffffff;
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+
+    .scanner-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    #qrReader {
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    .barcode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .suggest-box {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 40;
+    }
+
+    .suggest-item {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      padding: 8px 10px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .suggest-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggest-item:hover,
+    .suggest-item:focus {
+      background: var(--zone-item-bg);
+    }
+
+    .suggest-meta {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .basket-list {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 6px 8px;
+      margin-bottom: 8px;
+    }
+
+    .basket-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 2px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+
+    .basket-row:last-child {
+      border-bottom: none;
+    }
+
+    .basket-item-info {
+      flex: 1;
+    }
+
+    .basket-item-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .total-preview {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .total-preview .lbl {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .total-preview .amt {
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .print-row {
+      margin-bottom: 8px;
+    }
+
+    .print-row .btn-sm {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .history-toolbar {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .print-group {
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .form-footer {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .form-footer .btn {
+      flex: 1;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+      min-width: 420px;
+    }
+
+    th, td {
+      padding: 8px 7px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--surface-alt);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.72rem;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .rincian-line {
+      padding: 2px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .rincian-line:last-child {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .badge-income {
+      background: var(--income-soft);
+      color: var(--income);
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .icon-btn.del {
+      color: var(--expense);
+      border-color: #fecaca;
+      background: #fff5f5;
+    }
+
+    .empty-box {
+      text-align: center;
+      padding: 20px 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .toast {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #printReportArea {
+      display: none;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .app,
+      .login-card,
+      .top-nav,
+      .toast {
+        display: none !important;
+      }
+      #printReportArea {
+        display: block !important;
+        padding: 12px;
+        color: #0f172a;
+        font-size: 12px;
+      }
+      .print-title {
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .print-meta {
+        font-size: 11px;
+        color: #475569;
+        margin-bottom: 10px;
+      }
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
+      .print-table th,
+      .print-table td {
+        border: 1px solid #cbd5e1;
+        padding: 6px;
+        text-align: left;
+        font-size: 11px;
+      }
+      .print-total {
+        font-size: 13px;
+        font-weight: 800;
+        text-align: right;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+  <div id="printReportArea"></div>
+
+  <!-- GERBANG DAFTAR & LOGIN -->
+  <section class="login-card" id="loginGate">
+    <div class="login-title" id="authHeading">Daftar Akun Toko</div>
+    <div class="login-sub" id="authSub">Daftarkan Gmail, kata sandi, dan nama toko terlebih dahulu sebelum login.</div>
+
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="auth-tab-btn active" id="tabRegisterBtn" data-mode="register">Daftar</button>
+      <button type="button" class="auth-tab-btn" id="tabLoginBtn" data-mode="login">Login</button>
+    </div>
+
+    <!-- FORM DAFTAR -->
+    <form id="registerForm" autocomplete="off">
+      <div class="form-group">
+        <label for="regGmail">Email Gmail</label>
+        <input
+          type="email"
+          id="regGmail"
+          placeholder="namatoko@gmail.com"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="regPassword">Kata Sandi</label>
+        <input
+          type="password"
+          id="regPassword"
+          placeholder="Buat kata sandi"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="regStoreName">Nama Toko</label>
+        <input
+          type="text"
+          id="regStoreName"
+          placeholder="Contoh: Warung Berkah"
+          required
+        />
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button type="submit" class="btn btn-dark" style="width: 100%;" id="registerSubmitBtn">
+          Daftar Akun Toko
+        </button>
+      </div>
+    </form>
+
+    <!-- FORM LOGIN -->
+    <form id="loginForm" class="hidden" autocomplete="off">
+      <div class="form-group">
+        <label for="loginGmail">Email Gmail</label>
+        <input
+          type="email"
+          id="loginGmail"
+          placeholder="namatoko@gmail.com"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Kata Sandi</label>
+        <input
+          type="password"
+          id="loginPassword"
+          placeholder="Masukkan kata sandi"
+          required
+        />
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button type="submit" class="btn btn-dark" style="width: 100%;" id="loginSubmitBtn">
+          Masuk ke Toko
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- KONTEN UTAMA APLIKASI -->
+  <div class="app hidden" id="mainApp">
+    <!-- NAVBAR DI ATAS -->
+    <nav class="top-nav" id="topNav" aria-label="Menu Utama">
+      <button type="button" class="nav-btn active" data-menu="menu-summary">Ringkasan</button>
+      <button type="button" class="nav-btn" data-menu="menu-form">Catatan Kas</button>
+      <button type="button" class="nav-btn" data-menu="menu-catalog">Barang</button>
+      <button type="button" class="nav-btn" data-menu="menu-history">Riwayat</button>
+    </nav>
+
+    <!-- MENU 1: RINGKASAN -->
+    <section class="card" id="menu-summary">
+      <div class="section-title">
+        <span id="activeStoreLabel">Ringkasan Kas</span>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <div class="period-toggle" role="group" aria-label="Periode Ringkasan">
+            <button type="button" class="period-btn active" data-period="today">Hari Ini</button>
+            <button type="button" class="period-btn" data-period="month">Bulan Ini</button>
+          </div>
+          <button type="button" class="btn-sm" id="logoutBtn">Keluar</button>
+        </div>
+      </div>
+
+      <div class="date-badge-line" id="summaryDateDisplay">-</div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Pemasukan</div>
+          <div class="stat-val income-text" id="sumIncome">Rp0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Pengeluaran</div>
+          <div class="stat-val expense-text" id="sumExpense">Rp0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Selisih</div>
+          <div class="stat-val" id="sumNet">Rp0</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button type="button" class="btn btn-income" id="quickIncomeBtn">+ Pemasukan Eceran</button>
+        <button type="button" class="btn btn-expense" id="quickExpenseBtn">- Pengeluaran</button>
+      </div>
+    </section>
+
+    <!-- MENU 2: CATATAN KAS -->
+    <section class="card hidden" id="menu-form">
+      <div class="section-title">
+        <span id="formHeading">Catatan Kas</span>
+        <button type="button" class="btn-sm hidden" id="cancelEditBtn">Batal Edit</button>
+      </div>
+
+      <form id="trxForm" autocomplete="off">
+        <input type="hidden" id="editId" value="" />
+        <input type="hidden" id="scannedBarcode" value="" />
+
+        <div class="sub-card sub-card-meta">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="trxType">Jenis</label>
+              <select id="trxType">
+                <option value="income">Pemasukan (+)</option>
+                <option value="expense">Pengeluaran (-)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="trxDate">Tanggal</label>
+              <input type="date" id="trxDate" required />
+            </div>
+          </div>
+          <div class="brand-sub" id="formDayDisplay" style="margin-top:6px;">-</div>
+        </div>
+
+        <div id="retailItemCard" class="sub-card sub-card-item">
+          <div class="scanner-box hidden" id="scannerBox">
+            <div class="scanner-top">
+              <span class="brand-sub" id="scanStatusText">Mempersiapkan pemindai...</span>
+              <button type="button" class="btn-sm" id="closeScanBtn">Tutup</button>
+            </div>
+            <div id="qrReader" class="hidden"></div>
+            <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <label class="btn-sm" style="margin: 0; cursor: pointer;">
+                Foto Barcode
+                <input type="file" id="scanFileInput" accept="image/*" capture="environment" class="hidden" />
+              </label>
+              <span class="brand-sub">Bisa ambil foto / pilih gambar</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:3px;">
+              <label for="itemName" style="margin-bottom:0;">Nama Barang</label>
+              <button type="button" class="btn-scan" id="toggleScanBtn">Scan Barcode</button>
+            </div>
+            <input
+              type="text"
+              id="itemName"
+              placeholder="Ketik nama barang (harga tersimpan otomatis)..."
+            />
+            <div class="suggest-box hidden" id="itemSuggestBox"></div>
+            <div class="barcode-pill hidden" id="barcodeBadge">
+              <span>Barcode: <strong id="barcodeValueText"></strong></span>
+              <button type="button" id="clearBarcodeBtn" style="border:none;background:none;color:#166534;font-weight:800;cursor:pointer;">×</button>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="itemUnit">Satuan</label>
+              <select id="itemUnit">
+                <option value="sachet">sachet</option>
+                <option value="renteng">renteng</option>
+                <option value="bungkus">bungkus</option>
+                <option value="pcs">pcs</option>
+                <option value="botol">botol</option>
+                <option value="kg">kg</option>
+                <option value="gram">gram</option>
+                <option value="liter">liter</option>
+                <option value="porsi">porsi</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="itemQty">Qty</label>
+              <input type="number" id="itemQty" min="0.1" step="any" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-card sub-card-price">
+          <div id="retailPriceFields">
+            <div class="form-group">
+              <label for="unitPrice">Harga Satuan (Rp)</label>
+              <input type="number" id="unitPrice" min="1" step="any" placeholder="Ketik harga satuan" />
+            </div>
+
+            <div class="form-group">
+              <label for="autoTotalDisplay">Jumlah Item (Qty × Harga Satuan)</label>
+              <input type="text" id="autoTotalDisplay" value="Rp0" readonly />
+            </div>
+
+            <button type="button" class="btn btn-plus" id="addItemPlusBtn">+ Tambah ke Belanjaan</button>
+          </div>
+
+          <div id="directAmountFields" class="hidden">
+            <div class="form-group">
+              <label for="trxAmount">Nominal Pengeluaran (Rp)</label>
+              <input type="number" id="trxAmount" min="1" step="any" placeholder="Ketik nominal pengeluaran" />
+            </div>
+          </div>
+        </div>
+
+        <div id="basketSection" class="basket-list hidden">
+          <div id="basketRows"></div>
+        </div>
+
+        <div class="total-preview">
+          <span class="lbl">Total Belanja / Transaksi</span>
+          <span class="amt" id="finalAmountPreview">Rp0</span>
+        </div>
+
+        <div class="print-row">
+          <button type="button" class="btn-sm" id="printTrxBtn">Print</button>
+        </div>
+
+        <div class="sub-card sub-card-extra">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="trxCategory">Kategori</label>
+              <select id="trxCategory">
+                <option value="Cash">Cash</option>
+                <option value="Bon">Bon</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="trxNote">Catatan (Opsional)</label>
+              <input type="text" id="trxNote" maxlength="80" placeholder="Nama pembeli / catatan..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn btn-dark" id="submitTrxBtn">Simpan Transaksi</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- MENU 3: BARANG -->
+    <section class="card hidden" id="menu-catalog">
+      <div class="section-title">
+        <span>Barang</span>
+        <span id="catalogCountLabel" class="brand-sub">0 barang</span>
+      </div>
+
+      <form id="addCatalogForm" class="sub-card sub-card-item" autocomplete="off">
+        <div class="section-title" style="margin-bottom:8px;">
+          <span>Tambah Daftar Barang</span>
+        </div>
+
+        <div class="form-group">
+          <label for="newCatalogName">Nama Barang</label>
+          <input type="text" id="newCatalogName" placeholder="Contoh: Kopi Kapal Api" required />
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="newCatalogUnit">Satuan</label>
+            <select id="newCatalogUnit">
+              <option value="sachet">sachet</option>
+              <option value="renteng">renteng</option>
+              <option value="bungkus">bungkus</option>
+              <option value="pcs">pcs</option>
+              <option value="botol">botol</option>
+              <option value="kg">kg</option>
+              <option value="gram">gram</option>
+              <option value="liter">liter</option>
+              <option value="porsi">porsi</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="newCatalogPrice">Harga Satuan (Rp)</label>
+            <input type="number" id="newCatalogPrice" min="1" step="any" placeholder="Contoh: 2000" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newCatalogBarcode">Barcode (Opsional)</label>
+          <input type="text" id="newCatalogBarcode" placeholder="Nomor barcode jika ada" />
+        </div>
+
+        <button type="submit" class="btn btn-plus" id="saveCatalogBtn">+ Simpan ke Daftar Barang</button>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Barang</th>
+              <th>Satuan</th>
+              <th>Harga</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="catalogTableBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-box hidden" id="catalogEmptyState">
+        Belum ada barang terekam. Gunakan "Tambah Daftar Barang" atau catat transaksi agar harga tersimpan otomatis.
+      </div>
+    </section>
+
+    <!-- MENU 4: RIWAYAT -->
+    <section class="card hidden" id="menu-history">
+      <div class="section-title">
+        <span>Riwayat Pemasukan</span>
+        <span id="totalFilteredLabel" class="brand-sub">0 data</span>
+      </div>
+
+      <div class="date-badge-line" id="historyFilterDayDisplay">Semua Tanggal</div>
+
+      <div class="filter-grid">
+        <div class="form-group">
+          <label for="filterDate">Filter Tanggal</label>
+          <input type="date" id="filterDate" />
+        </div>
+
+        <div class="form-group">
+          <label for="filterSearch">Cari Barang / Barcode / Catatan</label>
+          <input type="text" id="filterSearch" placeholder="Ketik kata kunci atau barcode..." />
+        </div>
+      </div>
+
+      <div class="history-toolbar">
+        <button type="button" class="btn-sm" id="resetFiltersBtn">Reset Filter</button>
+        <div class="print-group">
+          <button type="button" class="btn-sm" id="printDayBtn">Print Hari</button>
+          <button type="button" class="btn-sm" id="printMonthBtn">Print Bulan</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hari & Tanggal</th>
+              <th>Jenis</th>
+              <th>Rincian</th>
+              <th>Jumlah</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="trxTableBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-box hidden" id="emptyState">Belum ada pemasukan yang tercatat.</div>
+    </section>
+  </div>
+
+  <script>
+    const DEFAULT_SHEET_WEBAPP_URL = "";
+
+    const ACCOUNTS_KEY = "catat_warung_accounts_v1";
+    const SESSION_KEY = "catat_warung_active_session_v1";
+    const STORAGE_KEY = "catat_warung_eceran_v15";
+    const CATALOG_KEY = "catat_warung_toko_catalog_v10";
+
+    const HARI_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const BULAN_ID = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const KNOWN_BARCODES = {
+      "8991002135376": {
+        name: "Kapal Api Special Mix",
+        unit: "sachet"
+      }
+    };
+
+    const CATEGORIES = {
+      income: ["Cash", "Bon"],
+      expense: ["Cash", "Bon"]
+    };
+
+    const state = {
+      accounts: loadAccounts(),
+      session: loadSession(),
+      transactions: [],
+      storeItems: [],
+      basket: [],
+      period: "today",
+      activeMenu: "menu-summary",
+      scannerInstance: null,
+      isScanning: false
+    };
+
+    const els = {
+      toast: document.getElementById("toast"),
+      printReportArea: document.getElementById("printReportArea"),
+      loginGate: document.getElementById("loginGate"),
+      authHeading: document.getElementById("authHeading"),
+      authSub: document.getElementById("authSub"),
+      tabRegisterBtn: document.getElementById("tabRegisterBtn"),
+      tabLoginBtn: document.getElementById("tabLoginBtn"),
+      registerForm: document.getElementById("registerForm"),
+      regGmail: document.getElementById("regGmail"),
+      regPassword: document.getElementById("regPassword"),
+      regStoreName: document.getElementById("regStoreName"),
+      registerSubmitBtn: document.getElementById("registerSubmitBtn"),
+      loginForm: document.getElementById("loginForm"),
+      loginGmail: document.getElementById("loginGmail"),
+      loginPassword: document.getElementById("loginPassword"),
+      loginSubmitBtn: document.getElementById("loginSubmitBtn"),
+      mainApp: document.getElementById("mainApp"),
+      topNav: document.getElementById("topNav"),
+      activeStoreLabel: document.getElementById("activeStoreLabel"),
+      logoutBtn: document.getElementById("logoutBtn"),
+      summaryDateDisplay: document.getElementById("summaryDateDisplay"),
+      formDayDisplay: document.getElementById("formDayDisplay"),
+      historyFilterDayDisplay: document.getElementById("historyFilterDayDisplay"),
+      menus: {
+        "menu-summary": document.getElementById("menu-summary"),
+        "menu-form": document.getElementById("menu-form"),
+        "menu-catalog": document.getElementById("menu-catalog"),
+        "menu-history": document.getElementById("menu-history")
+      },
+      navBtns: document.querySelectorAll(".nav-btn"),
+      periodBtns: document.querySelectorAll(".period-btn"),
+      sumIncome: document.getElementById("sumIncome"),
+      sumExpense: document.getElementById("sumExpense"),
+      sumNet: document.getElementById("sumNet"),
+      quickIncomeBtn: document.getElementById("quickIncomeBtn"),
+      quickExpenseBtn: document.getElementById("quickExpenseBtn"),
+      formHeading: document.getElementById("formHeading"),
+      cancelEditBtn: document.getElementById("cancelEditBtn"),
+      trxForm: document.getElementById("trxForm"),
+      editId: document.getElementById("editId"),
+      scannedBarcode: document.getElementById("scannedBarcode"),
+      barcodeBadge: document.getElementById("barcodeBadge"),
+      barcodeValueText: document.getElementById("barcodeValueText"),
+      clearBarcodeBtn: document.getElementById("clearBarcodeBtn"),
+      toggleScanBtn: document.getElementById("toggleScanBtn"),
+      scannerBox: document.getElementById("scannerBox"),
+      qrReader: document.getElementById("qrReader"),
+      closeScanBtn: document.getElementById("closeScanBtn"),
+      scanFileInput: document.getElementById("scanFileInput"),
+      scanStatusText: document.getElementById("scanStatusText"),
+      trxType: document.getElementById("trxType"),
+      trxDate: document.getElementById("trxDate"),
+      retailItemCard: document.getElementById("retailItemCard"),
+      itemName: document.getElementById("itemName"),
+      itemSuggestBox: document.getElementById("itemSuggestBox"),
+      itemUnit: document.getElementById("itemUnit"),
+      itemQty: document.getElementById("itemQty"),
+      retailPriceFields: document.getElementById("retailPriceFields"),
+      unitPrice: document.getElementById("unitPrice"),
+      autoTotalDisplay: document.getElementById("autoTotalDisplay"),
+      addItemPlusBtn: document.getElementById("addItemPlusBtn"),
+      directAmountFields: document.getElementById("directAmountFields"),
+      trxAmount: document.getElementById("trxAmount"),
+      basketSection: document.getElementById("basketSection"),
+      basketRows: document.getElementById("basketRows"),
+      trxCategory: document.getElementById("trxCategory"),
+      trxNote: document.getElementById("trxNote"),
+      finalAmountPreview: document.getElementById("finalAmountPreview"),
+      printTrxBtn: document.getElementById("printTrxBtn"),
+      submitTrxBtn: document.getElementById("submitTrxBtn"),
+
+      catalogCountLabel: document.getElementById("catalogCountLabel"),
+      addCatalogForm: document.getElementById("addCatalogForm"),
+      newCatalogName: document.getElementById("newCatalogName"),
+      newCatalogUnit: document.getElementById("newCatalogUnit"),
+      newCatalogPrice: document.getElementById("newCatalogPrice"),
+      newCatalogBarcode: document.getElementById("newCatalogBarcode"),
+      catalogTableBody: document.getElementById("catalogTableBody"),
+      catalogEmptyState: document.getElementById("catalogEmptyState"),
+
+      filterDate: document.getElementById("filterDate"),
+      filterSearch: document.getElementById("filterSearch"),
+      resetFiltersBtn: document.getElementById("resetFiltersBtn"),
+      printDayBtn: document.getElementById("printDayBtn"),
+      printMonthBtn: document.getElementById("printMonthBtn"),
+      totalFilteredLabel: document.getElementById("totalFilteredLabel"),
+      trxTableBody: document.getElementById("trxTableBody"),
+      emptyState: document.getElementById("emptyState")
+    };
+
+    function parseISODate(isoStr) {
+      const m = String(isoStr || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return null;
+      const year = Number(m[1]);
+      const monthIndex = Number(m[2]) - 1;
+      const day = Number(m[3]);
+      return new Date(year, monthIndex, day);
+    }
+
+    function getDayName(isoStr) {
+      const dt = parseISODate(isoStr);
+      if (!dt || Number.isNaN(dt.getTime())) return "";
+      return HARI_ID[dt.getDay()] || "";
+    }
+
+    function formatDDMMYY(isoStr) {
+      const dt = parseISODate(isoStr);
+      if (!dt || Number.isNaN(dt.getTime())) return String(isoStr || "");
+      const dd = String(dt.getDate()).padStart(2, "0");
+      const mm = String(dt.getMonth() + 1).padStart(2, "0");
+      const yy = String(dt.getFullYear()).slice(-2);
+      return `${dd}-${mm}-${yy}`;
+    }
+
+    function formatDayAndDDMMYY(isoStr) {
+      const dayName = getDayName(isoStr);
+      const ddmmyy = formatDDMMYY(isoStr);
+      return dayName ? `${dayName}, ${ddmmyy}` : ddmmyy;
+    }
+
+    function getMonthNameLabel(isoStr) {
+      const dt = parseISODate(isoStr);
+      if (!dt || Number.isNaN(dt.getTime())) return "";
+      const bulanNama = BULAN_ID[dt.getMonth()] || "";
+      const yy = String(dt.getFullYear()).slice(-2);
+      return `${bulanNama} '${yy}`;
+    }
+
+    function getTodayISO() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function getCurrentMonthPrefix() {
+      return getTodayISO().slice(0, 7);
+    }
+
+    function formatRupiah(num) {
+      return "Rp" + Math.round(Number(num || 0)).toLocaleString("id-ID");
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function showToast(msg) {
+      els.toast.textContent = msg;
+      els.toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        els.toast.classList.remove("show");
+      }, 2400);
+    }
+
+    function loadAccounts() {
+      try {
+        const raw = localStorage.getItem(ACCOUNTS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveAccounts() {
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(state.accounts));
+    }
+
+    function loadSession() {
+      try {
+        const raw = localStorage.getItem(SESSION_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        if (parsed && parsed.gmail) {
+          return parsed;
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveSession(sessionObj) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionObj));
+      state.session = sessionObj;
+    }
+
+    function clearSession() {
+      localStorage.removeItem(SESSION_KEY);
+      state.session = null;
+    }
+
+    function getScopedKey(baseKey) {
+      const accountKey = state.session?.gmail
+        ? String(state.session.gmail).trim().toLowerCase()
+        : "guest";
+      return `${baseKey}_${accountKey}`;
+    }
+
+    function loadTransactions() {
+      try {
+        const raw = localStorage.getItem(getScopedKey(STORAGE_KEY));
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTransactions() {
+      localStorage.setItem(getScopedKey(STORAGE_KEY), JSON.stringify(state.transactions));
+    }
+
+    function loadStoreItems() {
+      try {
+        const raw = localStorage.getItem(getScopedKey(CATALOG_KEY));
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveStoreItems() {
+      localStorage.setItem(getScopedKey(CATALOG_KEY), JSON.stringify(state.storeItems));
+    }
+
+    async function callSheetApi(payload) {
+      const url = String(DEFAULT_SHEET_WEBAPP_URL || "").trim();
+      if (!url) {
+        return { ok: false, offline: true };
+      }
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      return await res.json();
+    }
+
+    function applyCloudPayload(result) {
+      if (!result || !result.ok) return false;
+      if (Array.isArray(result.storeItems)) {
+        state.storeItems = result.storeItems;
+        saveStoreItems();
+      }
+      if (Array.isArray(result.transactions)) {
+        state.transactions = result.transactions;
+        saveTransactions();
+      }
+      return true;
+    }
+
+    function setAuthTab(mode) {
+      const isRegister = mode === "register";
+      els.tabRegisterBtn.classList.toggle("active", isRegister);
+      els.tabLoginBtn.classList.toggle("active", !isRegister);
+      els.registerForm.classList.toggle("hidden", !isRegister);
+      els.loginForm.classList.toggle("hidden", isRegister);
+
+      if (isRegister) {
+        els.authHeading.textContent = "Daftar Akun Toko";
+        els.authSub.textContent = "Masukkan Gmail, kata sandi, dan nama toko sebelum login.";
+      } else {
+        els.authHeading.textContent = "Login Pemilik Toko";
+        els.authSub.textContent = "Masuk memakai Gmail dan kata sandi yang sudah didaftarkan.";
+      }
+    }
+
+    function enterAppView() {
+      els.loginGate.classList.add("hidden");
+      els.mainApp.classList.remove("hidden");
+      els.topNav.classList.remove("hidden");
+      const label = state.session?.storeName
+        ? `${state.session.storeName}`
+        : state.session?.gmail || "Toko";
+      els.activeStoreLabel.textContent = `Kas • ${label}`;
+    }
+
+    function enterLoginView(preferredTab = null) {
+      els.mainApp.classList.add("hidden");
+      els.topNav.classList.add("hidden");
+      els.loginGate.classList.remove("hidden");
+
+      const targetTab = preferredTab || (state.accounts.length > 0 ? "login" : "register");
+      setAuthTab(targetTab);
+
+      if (state.session?.gmail) {
+        els.loginGmail.value = state.session.gmail;
+      }
+    }
+
+    els.tabRegisterBtn.addEventListener("click", () => setAuthTab("register"));
+    els.tabLoginBtn.addEventListener("click", () => setAuthTab("login"));
+
+    els.registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const gmail = els.regGmail.value.trim().toLowerCase();
+      const password = els.regPassword.value;
+      const storeName = els.regStoreName.value.trim();
+
+      if (!gmail || !gmail.includes("@") || !password || !storeName) {
+        showToast("Lengkapi Gmail, kata sandi, dan nama toko");
+        return;
+      }
+
+      const existingIdx = state.accounts.findIndex(
+        (acc) => String(acc.gmail || "").toLowerCase() === gmail
+      );
+
+      if (existingIdx >= 0) {
+        showToast("Gmail ini sudah terdaftar — silakan Login");
+        els.loginGmail.value = gmail;
+        setAuthTab("login");
+        return;
+      }
+
+      const newAccount = {
+        gmail,
+        password,
+        storeName,
+        createdAt: new Date().toISOString()
+      };
+
+      state.accounts.push(newAccount);
+      saveAccounts();
+
+      if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
+        try {
+          await callSheetApi({
+            action: "register",
+            storeId: gmail,
+            gmail,
+            pin: password,
+            storeName
+          });
+        } catch {
+          // Tetap tersimpan di akun lokal
+        }
+      }
+
+      els.regGmail.value = "";
+      els.regPassword.value = "";
+      els.regStoreName.value = "";
+      els.loginGmail.value = gmail;
+      els.loginPassword.value = "";
+      setAuthTab("login");
+      showToast("Pendaftaran berhasil — silakan login");
+    });
+
+    els.loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const gmail = els.loginGmail.value.trim().toLowerCase();
+      const password = els.loginPassword.value;
+
+      if (!gmail || !gmail.includes("@") || !password) {
+        showToast("Masukkan Gmail dan kata sandi");
+        return;
+      }
+
+      const foundAccount = state.accounts.find(
+        (acc) => String(acc.gmail || "").toLowerCase() === gmail
+      );
+
+      if (!foundAccount) {
+        showToast("Akun belum terdaftar — silakan Daftar dulu");
+        els.regGmail.value = gmail;
+        setAuthTab("register");
+        return;
+      }
+
+      if (foundAccount.password !== password) {
+        showToast("Kata sandi salah");
+        return;
+      }
+
+      els.loginSubmitBtn.disabled = true;
+      els.loginSubmitBtn.textContent = "Masuk...";
+
+      try {
+        saveSession({
+          gmail: foundAccount.gmail,
+          storeName: foundAccount.storeName
+        });
+
+        state.transactions = loadTransactions();
+        state.storeItems = loadStoreItems();
+
+        if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
+          try {
+            const res = await callSheetApi({
+              action: "login",
+              storeId: foundAccount.gmail,
+              gmail: foundAccount.gmail,
+              pin: foundAccount.password,
+              storeName: foundAccount.storeName
+            });
+            applyCloudPayload(res);
+          } catch {
+            // Gunakan data lokal bila offline
+          }
+        }
+
+        enterAppView();
+        await resetForm("income");
+        renderCatalogTable();
+        await switchMenu("menu-summary");
+        renderSummary();
+        renderTable();
+        showToast(`Selamat datang di ${foundAccount.storeName}`);
+      } finally {
+        els.loginSubmitBtn.disabled = false;
+        els.loginSubmitBtn.textContent = "Masuk ke Toko";
+      }
+    });
+
+    els.logoutBtn.addEventListener("click", async () => {
+      await stopScanner();
+      clearSession();
+      enterLoginView("login");
+      showToast("Anda telah keluar");
+    });
+
+    function upsertStoreItem({ name, unit, price, barcode = "" }) {
+      const cleanName = String(name || "").trim();
+      const cleanUnit = String(unit || "sachet").trim();
+      const cleanPrice = Number(price || 0);
+      const cleanBarcode = String(barcode || "").trim();
+
+      if (!cleanName || cleanPrice <= 0) return null;
+
+      const existingIdx = state.storeItems.findIndex((item) => {
+        if (cleanBarcode && item.barcode && item.barcode === cleanBarcode) return true;
+        return (
+          item.name.toLowerCase() === cleanName.toLowerCase() &&
+          item.unit.toLowerCase() === cleanUnit.toLowerCase()
+        );
+      });
+
+      let savedObj;
+      if (existingIdx >= 0) {
+        savedObj = {
+          ...state.storeItems[existingIdx],
+          name: cleanName,
+          unit: cleanUnit,
+          price: cleanPrice,
+          barcode: cleanBarcode || state.storeItems[existingIdx].barcode || ""
+        };
+        state.storeItems[existingIdx] = savedObj;
+      } else {
+        savedObj = {
+          id: "item_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+          name: cleanName,
+          unit: cleanUnit,
+          price: cleanPrice,
+          barcode: cleanBarcode
+        };
+        state.storeItems.unshift(savedObj);
+      }
+
+      saveStoreItems();
+      renderCatalogTable();
+      return savedObj;
+    }
+
+    els.addCatalogForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = els.newCatalogName.value.trim();
+      const unit = els.newCatalogUnit.value;
+      const price = Number(els.newCatalogPrice.value || 0);
+      const barcode = els.newCatalogBarcode.value.trim();
+
+      if (!name || price <= 0) {
+        showToast("Isi nama barang dan harga satuan");
+        return;
+      }
+
+      const savedItem = upsertStoreItem({ name, unit, price, barcode });
+      els.newCatalogName.value = "";
+      els.newCatalogPrice.value = "";
+      els.newCatalogBarcode.value = "";
+      els.newCatalogName.focus();
+      showToast("Barang tersimpan ke daftar");
+
+      if (savedItem && String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
+        try {
+          const res = await callSheetApi({
+            action: "saveTransaction",
+            storeId: state.session?.gmail || "",
+            itemsToRecord: [savedItem]
+          });
+          applyCloudPayload(res);
+          renderCatalogTable();
+        } catch {
+          // Tetap tersimpan lokal
+        }
+      }
+    });
+
+    function lookupSavedPrice({ name = "", unit = "", barcode = "" }) {
+      const cleanCode = String(barcode || "").trim();
+      const cleanName = String(name || "").trim().toLowerCase();
+      const cleanUnit = String(unit || "").trim().toLowerCase();
+
+      if (cleanCode) {
+        const byCode = state.storeItems.find(
+          (item) => item.barcode === cleanCode && Number(item.price) > 0
+        );
+        if (byCode) return byCode;
+      }
+
+      if (cleanName) {
+        const exactMatch = state.storeItems.find(
+          (item) =>
+            item.name.toLowerCase() === cleanName &&
+            (!cleanUnit || item.unit.toLowerCase() === cleanUnit) &&
+            Number(item.price) > 0
+        );
+        if (exactMatch) return exactMatch;
+
+        const anyUnitMatch = state.storeItems.find(
+          (item) => item.name.toLowerCase() === cleanName && Number(item.price) > 0
+        );
+        if (anyUnitMatch) return anyUnitMatch;
+      }
+
+      return null;
+    }
+
+    function autofillPriceFromStore() {
+      if (els.trxType.value !== "income") return;
+      const found = lookupSavedPrice({
+        name: els.itemName.value,
+        unit: els.itemUnit.value,
+        barcode: els.scannedBarcode.value
+      });
+      if (found && Number(found.price) > 0) {
+        els.unitPrice.value = found.price;
+        updateAmountCalculation();
+      }
+    }
+
+    function setBarcodeBadge(code) {
+      const clean = String(code || "").trim();
+      els.scannedBarcode.value = clean;
+      if (clean) {
+        els.barcodeValueText.textContent = clean;
+        els.barcodeBadge.classList.remove("hidden");
+      } else {
+        els.barcodeValueText.textContent = "";
+        els.barcodeBadge.classList.add("hidden");
+      }
+    }
+
+    function applyScannedCode(rawCode) {
+      const code = String(rawCode || "").trim();
+      if (!code) return;
+
+      setBarcodeBadge(code);
+      const knownSaved = state.storeItems.find((item) => item.barcode === code);
+      const knownDefault = KNOWN_BARCODES[code];
+
+      if (knownSaved) {
+        els.itemName.value = knownSaved.name;
+        if (knownSaved.unit) els.itemUnit.value = knownSaved.unit;
+        if (Number(knownSaved.price) > 0) {
+          els.unitPrice.value = knownSaved.price;
+        }
+        updateAmountCalculation();
+        showToast(`Barcode ${code}: ${knownSaved.name}`);
+      } else if (knownDefault) {
+        els.itemName.value = knownDefault.name;
+        if (knownDefault.unit) els.itemUnit.value = knownDefault.unit;
+        autofillPriceFromStore();
+        updateAmountCalculation();
+        showToast(`Barcode ${code}: ${knownDefault.name}`);
+      } else {
+        if (!els.itemName.value.trim()) {
+          els.itemName.focus();
+        }
+        showToast(`Barcode ${code} terbaca — isi nama, satuan, qty & harga`);
+      }
+    }
+
+    async function stopScanner() {
+      if (state.scannerInstance && state.isScanning) {
+        try {
+          await state.scannerInstance.stop();
+          await state.scannerInstance.clear();
+        } catch {
+          // Abaikan error saat menutup kamera
+        }
+      }
+      state.isScanning = false;
+      els.qrReader.classList.add("hidden");
+      els.scannerBox.classList.add("hidden");
+    }
+
+    async function startScanner() {
+      els.scannerBox.classList.remove("hidden");
+      els.qrReader.classList.add("hidden");
+
+      if (typeof Html5Qrcode === "undefined") {
+        els.scanStatusText.textContent = "Mode foto aktif (tidak ada koneksi CDN kamera live)";
+        return;
+      }
+
+      els.scanStatusText.textContent = "Mencoba kamera live...";
+
+      try {
+        if (!state.scannerInstance) {
+          state.scannerInstance = new Html5Qrcode("qrReader");
+        }
+        if (state.isScanning) {
+          await state.scannerInstance.stop();
+          state.isScanning = false;
+        }
+
+        els.qrReader.classList.remove("hidden");
+        await state.scannerInstance.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 240, height: 120 }
+          },
+          async (decodedText) => {
+            await stopScanner();
+            applyScannedCode(decodedText);
+          },
+          () => {}
+        );
+
+        state.isScanning = true;
+        els.scanStatusText.textContent = "Kamera live aktif";
+      } catch {
+        els.qrReader.classList.add("hidden");
+        els.scanStatusText.textContent = "Kamera live tidak tersedia — pakai 'Foto Barcode'";
+      }
+    }
+
+    async function switchMenu(menuId) {
+      if (!els.menus[menuId]) return;
+      if (menuId !== "menu-form") {
+        await stopScanner();
+      }
+
+      state.activeMenu = menuId;
+
+      Object.keys(els.menus).forEach((key) => {
+        if (key === menuId) {
+          els.menus[key].classList.remove("hidden");
+        } else {
+          els.menus[key].classList.add("hidden");
+        }
+      });
+
+      els.navBtns.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.menu === menuId);
+      });
+
+      hideSuggestions();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function populateCategories(type, selectedCat = "") {
+      const list = CATEGORIES[type] || CATEGORIES.income;
+      els.trxCategory.innerHTML = list
+        .map((cat) => `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`)
+        .join("");
+
+      if (selectedCat && list.includes(selectedCat)) {
+        els.trxCategory.value = selectedCat;
+      } else {
+        els.trxCategory.value = "Cash";
+      }
+    }
+
+    function getBasketTotal() {
+      return state.basket.reduce((sum, row) => sum + Math.round(Number(row.total || 0)), 0);
+    }
+
+    function getCurrentItemSubtotal() {
+      const qty = Number(els.itemQty.value || 0);
+      const price = Number(els.unitPrice.value || 0);
+      return Math.round(qty * price);
+    }
+
+    function getComputedAmount() {
+      if (els.trxType.value === "income") {
+        return getBasketTotal() + getCurrentItemSubtotal();
+      }
+      return Math.round(Number(els.trxAmount.value || 0));
+    }
+
+    function renderBasket() {
+      if (els.trxType.value !== "income" || state.basket.length === 0) {
+        els.basketSection.classList.add("hidden");
+        els.basketRows.innerHTML = "";
+        return;
+      }
+
+      els.basketSection.classList.remove("hidden");
+      els.basketRows.innerHTML = state.basket
+        .map((row, idx) => {
+          const codeTxt = row.barcode ? ` • #${escapeHtml(row.barcode)}` : "";
+          return `
+            <div class="basket-row">
+              <div class="basket-item-info">
+                <strong>${escapeHtml(row.name)}</strong>
+                <div class="basket-item-sub">${escapeHtml(row.qty)} ${escapeHtml(row.unit)} × ${formatRupiah(row.unitPrice)}${codeTxt}</div>
+              </div>
+              <div class="income-text"><strong>${formatRupiah(row.total)}</strong></div>
+              <button type="button" class="icon-btn del" onclick="removeBasketRow(${idx})">×</button>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    window.removeBasketRow = function (idx) {
+      state.basket.splice(idx, 1);
+      renderBasket();
+      updateAmountCalculation();
+    };
+
+    function updateAmountCalculation() {
+      const isIncome = els.trxType.value === "income";
+      if (isIncome) {
+        els.retailItemCard.classList.remove("hidden");
+        els.retailPriceFields.classList.remove("hidden");
+        els.directAmountFields.classList.add("hidden");
+
+        const itemTotal = getCurrentItemSubtotal();
+        els.autoTotalDisplay.value = formatRupiah(itemTotal);
+
+        const grandTotal = getComputedAmount();
+        els.finalAmountPreview.textContent = formatRupiah(grandTotal);
+        els.finalAmountPreview.className = "amt income-text";
+      } else {
+        els.retailItemCard.classList.add("hidden");
+        els.retailPriceFields.classList.add("hidden");
+        els.directAmountFields.classList.remove("hidden");
+        els.basketSection.classList.add("hidden");
+
+        const amt = Math.round(Number(els.trxAmount.value || 0));
+        els.finalAmountPreview.textContent = formatRupiah(amt);
+        els.finalAmountPreview.className = "amt expense-text";
+      }
+    }
+
+    function updateFormDayLabel() {
+      const val = els.trxDate.value || getTodayISO();
+      els.formDayDisplay.textContent = `Hari & Tanggal: ${formatDayAndDDMMYY(val)}`;
+    }
+
+    function syncFormState() {
+      const isEdit = Boolean(els.editId.value);
+      const isIncome = els.trxType.value === "income";
+
+      if (isEdit) {
+        els.formHeading.textContent = isIncome ? "Edit Pemasukan" : "Edit Pengeluaran";
+        els.submitTrxBtn.textContent = "Update Transaksi";
+        els.cancelEditBtn.classList.remove("hidden");
+      } else {
+        els.formHeading.textContent = "Catatan Kas";
+        els.submitTrxBtn.textContent = "Simpan Transaksi";
+        els.cancelEditBtn.classList.add("hidden");
+      }
+
+      updateFormDayLabel();
+      renderBasket();
+      updateAmountCalculation();
+    }
+
+    async function resetForm(defaultType = "income") {
+      await stopScanner();
+      state.basket = [];
+      els.editId.value = "";
+      els.trxType.value = defaultType;
+      els.trxDate.value = getTodayISO();
+      els.itemName.value = "";
+      els.itemUnit.value = "sachet";
+      els.itemQty.value = "1";
+      els.unitPrice.value = "";
+      els.trxAmount.value = "";
+      els.trxNote.value = "";
+      setBarcodeBadge("");
+      hideSuggestions();
+      populateCategories(defaultType, "Cash");
+      syncFormState();
+    }
+
+    function renderSuggestions(query = "") {
+      if (els.trxType.value !== "income" || state.storeItems.length === 0) {
+        hideSuggestions();
+        return;
+      }
+
+      const q = query.trim().toLowerCase();
+      const matches = q
+        ? state.storeItems.filter(
+            (item) =>
+              item.name.toLowerCase().includes(q) ||
+              (item.barcode && item.barcode.toLowerCase().includes(q)) ||
+              item.unit.toLowerCase().includes(q)
+          )
+        : state.storeItems.slice(0, 10);
+
+      if (matches.length === 0) {
+        hideSuggestions();
+        return;
+      }
+
+      els.itemSuggestBox.innerHTML = matches
+        .map(
+          (item, idx) => `
+            <button type="button" class="suggest-item" data-idx="${idx}" data-name="${escapeHtml(item.name)}" data-unit="${escapeHtml(item.unit)}" data-price="${item.price}" data-barcode="${escapeHtml(item.barcode || "")}">
+              <span><strong>${escapeHtml(item.name)}</strong></span>
+              <span class="suggest-meta">${escapeHtml(item.unit)} • ${formatRupiah(item.price)}</span>
+            </button>
+          `
+        )
+        .join("");
+
+      els.itemSuggestBox.querySelectorAll(".suggest-item").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          els.itemName.value = btn.dataset.name;
+          if (btn.dataset.unit) els.itemUnit.value = btn.dataset.unit;
+          if (Number(btn.dataset.price) > 0) els.unitPrice.value = btn.dataset.price;
+          if (btn.dataset.barcode) setBarcodeBadge(btn.dataset.barcode);
+          hideSuggestions();
+          updateAmountCalculation();
+          els.itemQty.focus();
+        });
+      });
+
+      els.itemSuggestBox.classList.remove("hidden");
+    }
+
+    function hideSuggestions() {
+      els.itemSuggestBox.classList.add("hidden");
+    }
+
+    function renderCatalogTable() {
+      els.catalogCountLabel.textContent = `${state.storeItems.length} barang`;
+
+      if (state.storeItems.length === 0) {
+        els.catalogTableBody.innerHTML = "";
+        els.catalogEmptyState.classList.remove("hidden");
+        return;
+      }
+
+      els.catalogEmptyState.classList.add("hidden");
+      els.catalogTableBody.innerHTML = state.storeItems
+        .map((item) => {
+          const codeSub = item.barcode
+            ? `<div class="brand-sub">#${escapeHtml(item.barcode)}</div>`
+            : "";
+          return `
+            <tr>
+              <td>
+                <strong>${escapeHtml(item.name)}</strong>
+                ${codeSub}
+              </td>
+              <td>${escapeHtml(item.unit)}</td>
+              <td><strong class="income-text">${formatRupiah(item.price)}</strong></td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="icon-btn" onclick="pickStoreItemToForm('${escapeHtml(item.id)}')">Pakai</button>
+                  <button type="button" class="icon-btn del" onclick="deleteStoreItem('${escapeHtml(item.id)}')">Hapus</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    window.pickStoreItemToForm = async function (id) {
+      const target = state.storeItems.find((i) => i.id === id);
+      if (!target) return;
+      await resetForm("income");
+      els.itemName.value = target.name;
+      if (target.unit) els.itemUnit.value = target.unit;
+      if (Number(target.price) > 0) els.unitPrice.value = target.price;
+      if (target.barcode) setBarcodeBadge(target.barcode);
+      updateAmountCalculation();
+      await switchMenu("menu-form");
+    };
+
+    window.deleteStoreItem = async function (id) {
+      const ok = confirm("Hapus barang ini dari daftar?");
+      if (!ok) return;
+      state.storeItems = state.storeItems.filter((i) => i.id !== id);
+      saveStoreItems();
+      renderCatalogTable();
+      showToast("Barang dihapus");
+      try {
+        const res = await callSheetApi({
+          action: "deleteItem",
+          storeId: state.session?.gmail || "",
+          id
+        });
+        applyCloudPayload(res);
+        renderCatalogTable();
+        renderSummary();
+        renderTable();
+      } catch {
+        // Tetap tersimpan lokal
+      }
+    };
+
+    els.itemUnit.addEventListener("change", autofillPriceFromStore);
+
+    function renderSummary() {
+      const today = getTodayISO();
+      const monthPrefix = getCurrentMonthPrefix();
+
+      if (state.period === "today") {
+        els.summaryDateDisplay.textContent = `Hari Ini • ${formatDayAndDDMMYY(today)}`;
+      } else {
+        els.summaryDateDisplay.textContent = `Bulan Ini • ${getMonthNameLabel(today)} (${formatDDMMYY(monthPrefix + "-01").slice(3)})`;
+      }
+
+      let income = 0;
+      let expense = 0;
+
+      for (const item of state.transactions) {
+        const matchPeriod =
+          state.period === "today"
+            ? item.date === today
+            : String(item.date || "").startsWith(monthPrefix);
+
+        if (!matchPeriod) continue;
+        if (item.type === "income") income += Number(item.amount || 0);
+        if (item.type === "expense") expense += Number(item.amount || 0);
+      }
+
+      const net = income - expense;
+      els.sumIncome.textContent = formatRupiah(income);
+      els.sumExpense.textContent = formatRupiah(expense);
+      els.sumNet.textContent = formatRupiah(net);
+      els.sumNet.className = "stat-val " + (net >= 0 ? "income-text" : "expense-text");
+    }
+
+    function getTransactionLineItems(item) {
+      if (Array.isArray(item.items) && item.items.length > 0) {
+        return item.items.map((x) => ({
+          name: x.name || "Barang",
+          qty: Number(x.qty || 1),
+          unit: x.unit || "pcs",
+          unitPrice: Number(x.unitPrice || 0),
+          total: Math.round(Number(x.total ?? Number(x.qty || 1) * Number(x.unitPrice || 0))),
+          barcode: x.barcode || ""
+        }));
+      }
+      if (item.itemName) {
+        const q = Number(item.qty || 1);
+        const p = Number(item.unitPrice || item.amount || 0);
+        return [{
+          name: item.itemName,
+          qty: q,
+          unit: item.unit || "pcs",
+          unitPrice: p,
+          total: Math.round(Number(item.amount || q * p)),
+          barcode: item.barcode || ""
+        }];
+      }
+      return [{
+        name: item.category || "Pemasukan",
+        qty: 1,
+        unit: "trx",
+        unitPrice: Number(item.amount || 0),
+        total: Math.round(Number(item.amount || 0)),
+        barcode: item.barcode || ""
+      }];
+    }
+
+    function getFilteredIncomeTransactions() {
+      const dateVal = els.filterDate.value;
+      const q = els.filterSearch.value.trim().toLowerCase();
+
+      return state.transactions
+        .filter((item) => {
+          if (item.type !== "income") return false;
+          const okDate = !dateVal || item.date === dateVal;
+          const lines = getTransactionLineItems(item);
+          const itemsText = lines.map((x) => `${x.name} ${x.barcode || ""}`).join(" ");
+          const hay = `${item.itemName || ""} ${itemsText} ${item.barcode || ""} ${item.category || ""} ${item.note || ""}`.toLowerCase();
+          const okSearch = !q || hay.includes(q);
+          return okDate && okSearch;
+        })
+        .sort((a, b) => {
+          const dCmp = String(b.date).localeCompare(String(a.date));
+          if (dCmp !== 0) return dCmp;
+          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+        });
+    }
+
+    function renderTable() {
+      const dateVal = els.filterDate.value;
+      els.historyFilterDayDisplay.textContent = dateVal
+        ? `Filter: ${formatDayAndDDMMYY(dateVal)}`
+        : `Semua Tanggal • Hari Ini: ${formatDayAndDDMMYY(getTodayISO())}`;
+
+      const items = getFilteredIncomeTransactions();
+      els.totalFilteredLabel.textContent = `${items.length} transaksi`;
+
+      if (items.length === 0) {
+        els.trxTableBody.innerHTML = "";
+        els.emptyState.classList.remove("hidden");
+        return;
+      }
+
+      els.emptyState.classList.add("hidden");
+      els.trxTableBody.innerHTML = items
+        .map((item) => {
+          const lines = getTransactionLineItems(item);
+          const metaParts = [];
+          if (item.category) metaParts.push(escapeHtml(item.category));
+          if (item.note) metaParts.push(escapeHtml(item.note));
+          const metaHtml = metaParts.length
+            ? `<div class="brand-sub" style="margin-top:2px;">${metaParts.join(" • ")}</div>`
+            : "";
+
+          const rincianHtml = lines
+            .map((x) => {
+              const codeNote = x.barcode ? ` (#${escapeHtml(x.barcode)})` : "";
+              return `<div class="rincian-line">• <strong>${escapeHtml(x.name)}</strong>${codeNote} — ${escapeHtml(x.qty)} ${escapeHtml(x.unit)} × ${formatRupiah(x.unitPrice)} = <strong>${formatRupiah(x.total)}</strong></div>`;
+            })
+            .join("");
+
+          const dayLabel = escapeHtml(getDayName(item.date));
+          const dateLabel = escapeHtml(formatDDMMYY(item.date));
+
+          return `
+            <tr>
+              <td>
+                <div><strong>${dayLabel}</strong></div>
+                <div class="brand-sub">${dateLabel}</div>
+              </td>
+              <td><span class="badge badge-income">Masuk</span></td>
+              <td>
+                ${rincianHtml}
+                ${metaHtml}
+              </td>
+              <td class="income-text"><strong>+${formatRupiah(item.amount)}</strong></td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="icon-btn" onclick="startEdit('${escapeHtml(item.id)}')">Edit</button>
+                  <button type="button" class="icon-btn del" onclick="removeTrx('${escapeHtml(item.id)}')">Hapus</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function printHistoryPeriod(mode) {
+      const refDate = els.filterDate.value || getTodayISO();
+      const monthPrefix = refDate.slice(0, 7);
+      const q = els.filterSearch.value.trim().toLowerCase();
+
+      const matched = state.transactions
+        .filter((item) => {
+          if (item.type !== "income") return false;
+          const matchDate =
+            mode === "day"
+              ? item.date === refDate
+              : String(item.date || "").startsWith(monthPrefix);
+          if (!matchDate) return false;
+
+          const lines = getTransactionLineItems(item);
+          const itemsText = lines.map((x) => `${x.name} ${x.barcode || ""}`).join(" ");
+          const hay = `${item.itemName || ""} ${itemsText} ${item.barcode || ""} ${item.category || ""} ${item.note || ""}`.toLowerCase();
+          return !q || hay.includes(q);
+        })
+        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+      const periodLabel =
+        mode === "day"
+          ? `Laporan Pemasukan Harian (${formatDayAndDDMMYY(refDate)})`
+          : `Laporan Pemasukan Bulanan (${getMonthNameLabel(refDate)})`;
+
+      let grandTotal = 0;
+      const rowsHtml = [];
+
+      for (const trx of matched) {
+        const lines = getTransactionLineItems(trx);
+        for (const ln of lines) {
+          grandTotal += Math.round(Number(ln.total || 0));
+          rowsHtml.push(`
+            <tr>
+              <td>${escapeHtml(formatDayAndDDMMYY(trx.date))}</td>
+              <td>${escapeHtml(ln.name)}</td>
+              <td>${escapeHtml(ln.qty)} ${escapeHtml(ln.unit)}</td>
+              <td>${formatRupiah(ln.unitPrice)}</td>
+              <td>${escapeHtml(trx.category || "Cash")}${trx.note ? " • " + escapeHtml(trx.note) : ""}</td>
+              <td>${formatRupiah(ln.total)}</td>
+            </tr>
+          `);
+        }
+      }
+
+      els.printReportArea.innerHTML = `
+        <div class="print-title">${escapeHtml(periodLabel)}</div>
+        <div class="print-meta">Toko: ${escapeHtml(state.session?.storeName || state.session?.gmail || "-")} • Dicetak: ${escapeHtml(formatDayAndDDMMYY(getTodayISO()))} • Total Item: ${rowsHtml.length}</div>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th>Hari & Tanggal</th>
+              <th>Barang</th>
+              <th>Qty</th>
+              <th>Harga</th>
+              <th>Ket</th>
+              <th>Jumlah</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              rowsHtml.length > 0
+                ? rowsHtml.join("")
+                : `<tr><td colspan="6" style="text-align:center;">Tidak ada data pemasukan pada periode ini.</td></tr>`
+            }
+          </tbody>
+        </table>
+        <div class="print-total">Total Pemasukan: ${formatRupiah(grandTotal)}</div>
+      `;
+
+      window.print();
+    }
+
+    function refreshAll() {
+      saveTransactions();
+      renderSummary();
+      renderTable();
+    }
+
+    window.startEdit = async function (id) {
+      const target = state.transactions.find((t) => t.id === id);
+      if (!target) return;
+
+      await stopScanner();
+      state.basket = [];
+      els.editId.value = target.id;
+      els.trxType.value = target.type;
+      els.trxDate.value = target.date;
+      els.trxNote.value = target.note || "";
+      populateCategories(target.type, target.category);
+
+      if (target.type === "income") {
+        if (Array.isArray(target.items) && target.items.length > 0) {
+          state.basket = target.items.map((x) => ({ ...x }));
+          els.itemName.value = "";
+          els.unitPrice.value = "";
+          els.itemQty.value = "1";
+          setBarcodeBadge("");
+        } else {
+          els.itemName.value = target.itemName || "";
+          els.itemUnit.value = target.unit || "sachet";
+          els.itemQty.value = target.qty || 1;
+          els.unitPrice.value = target.unitPrice || target.amount || "";
+          setBarcodeBadge(target.barcode || "");
+        }
+      } else {
+        els.trxAmount.value = target.amount || "";
+        setBarcodeBadge("");
+      }
+
+      syncFormState();
+      await switchMenu("menu-form");
+    };
+
+    window.removeTrx = async function (id) {
+      const ok = confirm("Yakin ingin menghapus transaksi ini?");
+      if (!ok) return;
+      state.transactions = state.transactions.filter((t) => t.id !== id);
+      if (els.editId.value === id) {
+        await resetForm("income");
+      }
+      refreshAll();
+      showToast("Transaksi dihapus");
+
+      try {
+        const res = await callSheetApi({
+          action: "deleteTransaction",
+          storeId: state.session?.gmail || "",
+          id
+        });
+        applyCloudPayload(res);
+        renderCatalogTable();
+        refreshAll();
+      } catch {
+        // Tetap tersimpan lokal
+      }
+    };
+
+    els.addItemPlusBtn.addEventListener("click", () => {
+      const name = els.itemName.value.trim();
+      const unit = els.itemUnit.value;
+      const qty = Number(els.itemQty.value || 0);
+      const unitPrice = Number(els.unitPrice.value || 0);
+      const barcode = els.scannedBarcode.value.trim();
+
+      if (!name) {
+        showToast("Isi nama barang dulu");
+        els.itemName.focus();
+        return;
+      }
+      if (qty <= 0 || unitPrice <= 0) {
+        showToast("Isi qty dan harga satuan dulu");
+        return;
+      }
+
+      const total = Math.round(qty * unitPrice);
+      state.basket.push({ name, unit, qty, unitPrice, barcode, total });
+      upsertStoreItem({ name, unit, price: unitPrice, barcode });
+
+      els.itemName.value = "";
+      els.itemQty.value = "1";
+      els.unitPrice.value = "";
+      setBarcodeBadge("");
+      hideSuggestions();
+      renderBasket();
+      updateAmountCalculation();
+      els.itemName.focus();
+      showToast("Item ditambah & harga tersimpan");
+    });
+
+    els.printTrxBtn.addEventListener("click", () => {
+      const dateStr = els.trxDate.value || getTodayISO();
+      const catStr = els.trxCategory.value || "Cash";
+      const noteStr = els.trxNote.value.trim();
+
+      const lines = state.basket.map((x) => ({ ...x }));
+      const curName = els.itemName.value.trim();
+      const curUnit = els.itemUnit.value;
+      const curQty = Number(els.itemQty.value || 0);
+      const curPrice = Number(els.unitPrice.value || 0);
+      const curBarcode = els.scannedBarcode.value.trim();
+      if (curName && curQty > 0 && curPrice > 0) {
+        lines.push({
+          name: curName,
+          unit: curUnit,
+          qty: curQty,
+          unitPrice: curPrice,
+          barcode: curBarcode,
+          total: Math.round(curQty * curPrice)
+        });
+      }
+
+      const totalAmt =
+        els.trxType.value === "income"
+          ? lines.reduce((s, x) => s + Math.round(Number(x.total || 0)), 0)
+          : Math.round(Number(els.trxAmount.value || 0));
+
+      els.printReportArea.innerHTML = `
+        <div class="print-title">Struk Belanja</div>
+        <div class="print-meta">Toko: ${escapeHtml(state.session?.storeName || state.session?.gmail || "-")} • ${escapeHtml(formatDayAndDDMMYY(dateStr))} • Kategori: ${escapeHtml(catStr)}${noteStr ? " • " + escapeHtml(noteStr) : ""}</div>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th>Barang</th>
+              <th>Qty</th>
+              <th>Harga</th>
+              <th>Jumlah</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              lines.length > 0
+                ? lines
+                    .map(
+                      (x) => `
+                        <tr>
+                          <td>${escapeHtml(x.name)}</td>
+                          <td>${escapeHtml(x.qty)} ${escapeHtml(x.unit)}</td>
+                          <td>${formatRupiah(x.unitPrice)}</td>
+                          <td>${formatRupiah(x.total)}</td>
+                        </tr>
+                      `
+                    )
+                    .join("")
+                : `<tr><td colspan="4">${escapeHtml(catStr)}</td></tr>`
+            }
+          </tbody>
+        </table>
+        <div class="print-total">Total: ${formatRupiah(totalAmt)}</div>
+      `;
+
+      window.print();
+    });
+
+    els.printDayBtn.addEventListener("click", () => printHistoryPeriod("day"));
+    els.printMonthBtn.addEventListener("click", () => printHistoryPeriod("month"));
+
+    els.navBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        switchMenu(btn.dataset.menu);
+      });
+    });
+
+    els.periodBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        els.periodBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.period = btn.dataset.period;
+        renderSummary();
+      });
+    });
+
+    els.quickIncomeBtn.addEventListener("click", async () => {
+      await resetForm("income");
+      await switchMenu("menu-form");
+    });
+
+    els.quickExpenseBtn.addEventListener("click", async () => {
+      await resetForm("expense");
+      await switchMenu("menu-form");
+    });
+
+    els.toggleScanBtn.addEventListener("click", () => {
+      if (!els.scannerBox.classList.contains("hidden")) {
+        stopScanner();
+      } else {
+        startScanner();
+      }
+    });
+
+    els.closeScanBtn.addEventListener("click", () => {
+      stopScanner();
+    });
+
+    els.clearBarcodeBtn.addEventListener("click", () => {
+      setBarcodeBadge("");
+    });
+
+    els.scanFileInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        if (typeof Html5Qrcode === "undefined") {
+          showToast("Scanner tidak tersedia");
+          return;
+        }
+        const tempId = "tempQr_" + Date.now();
+        const tempDiv = document.createElement("div");
+        tempDiv.id = tempId;
+        tempDiv.className = "hidden";
+        document.body.appendChild(tempDiv);
+
+        const tempScanner = new Html5Qrcode(tempId);
+        const decoded = await tempScanner.scanFile(file, true);
+        await tempScanner.clear();
+        tempDiv.remove();
+
+        await stopScanner();
+        applyScannedCode(decoded);
+      } catch {
+        showToast("Barcode pada foto tidak terbaca");
+      } finally {
+        e.target.value = "";
+      }
+    });
+
+    els.itemName.addEventListener("focus", () => {
+      renderSuggestions(els.itemName.value);
+    });
+
+    els.itemName.addEventListener("input", () => {
+      renderSuggestions(els.itemName.value);
+      autofillPriceFromStore();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#retailItemCard")) {
+        hideSuggestions();
+      }
+    });
+
+    els.trxDate.addEventListener("change", updateFormDayLabel);
+
+    els.trxType.addEventListener("change", async () => {
+      if (els.trxType.value !== "income") {
+        await stopScanner();
+        setBarcodeBadge("");
+        state.basket = [];
+      }
+      populateCategories(els.trxType.value, "Cash");
+      hideSuggestions();
+      syncFormState();
+      autofillPriceFromStore();
+    });
+
+    els.cancelEditBtn.addEventListener("click", () => {
+      resetForm("income");
+    });
+
+    [els.itemQty, els.unitPrice, els.trxAmount].forEach((inp) => {
+      inp.addEventListener("input", updateAmountCalculation);
+    });
+
+    els.trxForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const type = els.trxType.value;
+      const date = els.trxDate.value || getTodayISO();
+      const category = els.trxCategory.value || "Cash";
+      const note = els.trxNote.value.trim();
+
+      let itemsToSave = [];
+      let recordedItems = [];
+      let itemName = "";
+      let unit = "";
+      let qty = 1;
+      let unitPrice = 0;
+      let barcode = "";
+
+      if (type === "income") {
+        itemsToSave = state.basket.map((x) => ({ ...x }));
+
+        const currentName = els.itemName.value.trim();
+        const currentUnit = els.itemUnit.value;
+        const currentQty = Number(els.itemQty.value || 0);
+        const currentPrice = Number(els.unitPrice.value || 0);
+        const currentBarcode = els.scannedBarcode.value.trim();
+
+        if (currentName && currentQty > 0 && currentPrice > 0) {
+          const currentRow = {
+            name: currentName,
+            unit: currentUnit,
+            qty: currentQty,
+            unitPrice: currentPrice,
+            barcode: currentBarcode,
+            total: Math.round(currentQty * currentPrice)
+          };
+          itemsToSave.push(currentRow);
+          const savedItem = upsertStoreItem({
+            name: currentName,
+            unit: currentUnit,
+            price: currentPrice,
+            barcode: currentBarcode
+          });
+          if (savedItem) recordedItems.push(savedItem);
+        }
+
+        itemsToSave.forEach((row) => {
+          const saved = upsertStoreItem({
+            name: row.name,
+            unit: row.unit,
+            price: row.unitPrice,
+            barcode: row.barcode || ""
+          });
+          if (saved) recordedItems.push(saved);
+        });
+
+        if (itemsToSave.length === 0) {
+          showToast("Isi barang atau klik + Tambah ke Belanjaan");
+          return;
+        }
+
+        if (itemsToSave.length === 1) {
+          itemName = itemsToSave[0].name;
+          unit = itemsToSave[0].unit;
+          qty = itemsToSave[0].qty;
+          unitPrice = itemsToSave[0].unitPrice;
+          barcode = itemsToSave[0].barcode || "";
+        }
+      }
+
+      const amount =
+        type === "income"
+          ? itemsToSave.reduce((s, x) => s + Math.round(Number(x.total || 0)), 0)
+          : Math.round(Number(els.trxAmount.value || 0));
+
+      if (!amount || amount <= 0) {
+        showToast("Nominal harus lebih dari 0");
+        return;
+      }
+
+      const editingId = els.editId.value;
+      const trxRecord = {
+        id: editingId || ("trx_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6)),
+        type,
+        date,
+        category,
+        note,
+        amount,
+        items: type === "income" ? itemsToSave : [],
+        itemName: type === "income" ? itemName : "",
+        unit: type === "income" ? unit : "",
+        qty: type === "income" ? qty : null,
+        unitPrice: type === "income" ? unitPrice : null,
+        barcode: type === "income" ? barcode : "",
+        createdAt: new Date().toISOString()
+      };
+
+      if (editingId) {
+        state.transactions = state.transactions.map((t) =>
+          t.id === editingId ? { ...t, ...trxRecord } : t
+        );
+        showToast("Transaksi diperbarui");
+      } else {
+        state.transactions.push(trxRecord);
+        showToast("Transaksi & harga barang tersimpan");
+      }
+
+      await resetForm(type);
+      refreshAll();
+
+      if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
+        try {
+          const res = await callSheetApi({
+            action: "saveTransaction",
+            storeId: state.session?.gmail || "",
+            transaction: trxRecord,
+            itemsToRecord: recordedItems
+          });
+          applyCloudPayload(res);
+          renderCatalogTable();
+          refreshAll();
+        } catch {
+          // Tetap aman tersimpan di lokal
+        }
+      }
+    });
+
+    [els.filterDate, els.filterSearch].forEach((input) => {
+      input.addEventListener("input", renderTable);
+      input.addEventListener("change", renderTable);
+    });
+
+    els.resetFiltersBtn.addEventListener("click", () => {
+      els.filterDate.value = "";
+      els.filterSearch.value = "";
+      renderTable();
+    });
+
+    async function init() {
+      if (!state.session) {
+        enterLoginView();
+        return;
+      }
+
+      state.transactions = loadTransactions();
+      state.storeItems = loadStoreItems();
+      enterAppView();
+      await resetForm("income");
+      renderCatalogTable();
+      await switchMenu("menu-summary");
+      renderSummary();
+      renderTable();
+    }
+
+    init();
+  </script>
+</body>
+</html>
