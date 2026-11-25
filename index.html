@@ -53,66 +53,6 @@
       margin: 0 auto;
     }
 
-    .login-card {
-      max-width: 420px;
-      margin: 28px auto;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .login-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .login-sub {
-      font-size: 0.76rem;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-
-    .auth-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      background: var(--surface-alt);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 12px;
-    }
-
-    .auth-tab-btn {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      padding: 7px 8px;
-      border-radius: 7px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-tab-btn.active {
-      background: var(--accent);
-      color: #ffffff;
-    }
-
-    .link-btn {
-      border: none;
-      background: transparent;
-      color: var(--accent);
-      font-size: 0.76rem;
-      font-weight: 700;
-      text-decoration: underline;
-      cursor: pointer;
-      padding: 4px 0;
-    }
-
     .top-nav {
       position: sticky;
       top: 8px;
@@ -611,11 +551,6 @@
 
     .rincian-line {
       padding: 2px 0;
-      border-bottom: 1px dashed #e2e8f0;
-    }
-
-    .rincian-line:last-child {
-      border-bottom: none;
     }
 
     .badge {
@@ -702,7 +637,6 @@
         padding: 0;
       }
       .app,
-      .login-card,
       .top-nav,
       .toast {
         display: none !important;
@@ -747,129 +681,8 @@
   <div class="toast" id="toast"></div>
   <div id="printReportArea"></div>
 
-  <!-- GERBANG DAFTAR, LOGIN & LUPA KATA SANDI -->
-  <section class="login-card" id="loginGate">
-    <div class="login-title" id="authHeading">Daftar Akun Toko</div>
-    <div class="login-sub" id="authSub">Daftarkan Gmail, kata sandi, dan nama toko terlebih dahulu sebelum login.</div>
-
-    <div class="auth-tabs" id="authTabs" role="tablist">
-      <button type="button" class="auth-tab-btn active" id="tabRegisterBtn" data-mode="register">Daftar</button>
-      <button type="button" class="auth-tab-btn" id="tabLoginBtn" data-mode="login">Login</button>
-    </div>
-
-    <!-- FORM DAFTAR -->
-    <form id="registerForm" autocomplete="off">
-      <div class="form-group">
-        <label for="regGmail">Email Gmail</label>
-        <input
-          type="email"
-          id="regGmail"
-          placeholder="namatoko@gmail.com"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="regPassword">Kata Sandi</label>
-        <input
-          type="password"
-          id="regPassword"
-          placeholder="Buat kata sandi"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="regStoreName">Nama Toko</label>
-        <input
-          type="text"
-          id="regStoreName"
-          placeholder="Contoh: Warung Berkah"
-          required
-        />
-      </div>
-
-      <div style="margin-top: 10px;">
-        <button type="submit" class="btn btn-dark" style="width: 100%;" id="registerSubmitBtn">
-          Daftar Akun Toko
-        </button>
-      </div>
-    </form>
-
-    <!-- FORM LOGIN -->
-    <form id="loginForm" class="hidden" autocomplete="off">
-      <div class="form-group">
-        <label for="loginGmail">Email Gmail</label>
-        <input
-          type="email"
-          id="loginGmail"
-          placeholder="namatoko@gmail.com"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="loginPassword">Kata Sandi</label>
-        <input
-          type="password"
-          id="loginPassword"
-          placeholder="Masukkan kata sandi"
-          required
-        />
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
-        <button type="button" class="link-btn" id="openForgotBtn">Lupa Kata Sandi?</button>
-      </div>
-
-      <div>
-        <button type="submit" class="btn btn-dark" style="width: 100%;" id="loginSubmitBtn">
-          Masuk ke Toko
-        </button>
-      </div>
-    </form>
-
-    <!-- FORM LUPA KATA SANDI -->
-    <form id="forgotForm" class="hidden" autocomplete="off">
-      <div class="form-group">
-        <label for="forgotGmail">Email Gmail Terdaftar</label>
-        <input
-          type="email"
-          id="forgotGmail"
-          placeholder="namatoko@gmail.com"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="forgotStoreName">Nama Toko Terdaftar</label>
-        <input
-          type="text"
-          id="forgotStoreName"
-          placeholder="Contoh: Warung Berkah"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="forgotNewPassword">Kata Sandi Baru</label>
-        <input
-          type="password"
-          id="forgotNewPassword"
-          placeholder="Masukkan kata sandi baru"
-          required
-        />
-      </div>
-
-      <div class="form-footer">
-        <button type="button" class="btn-sm" id="backToLoginBtn">Kembali Login</button>
-        <button type="submit" class="btn btn-dark" id="resetPassSubmitBtn">Reset Kata Sandi</button>
-      </div>
-    </form>
-  </section>
-
   <!-- KONTEN UTAMA APLIKASI -->
-  <div class="app hidden" id="mainApp">
+  <div class="app" id="mainApp">
     <!-- NAVBAR DI ATAS -->
     <nav class="top-nav" id="topNav" aria-label="Menu Utama">
       <button type="button" class="nav-btn active" data-menu="menu-summary">Ringkasan</button>
@@ -883,12 +696,9 @@
     <section class="card" id="menu-summary">
       <div class="section-title">
         <span id="activeStoreLabel">Ringkasan Kas</span>
-        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-          <div class="period-toggle" role="group" aria-label="Periode Ringkasan">
-            <button type="button" class="period-btn active" data-period="today">Hari Ini</button>
-            <button type="button" class="period-btn" data-period="month">Bulan Ini</button>
-          </div>
-          <button type="button" class="btn-sm" id="logoutBtn">Keluar</button>
+        <div class="period-toggle" role="group" aria-label="Periode Ringkasan">
+          <button type="button" class="period-btn active" data-period="today">Hari Ini</button>
+          <button type="button" class="period-btn" data-period="month">Bulan Ini</button>
         </div>
       </div>
 
@@ -1060,7 +870,7 @@
       </form>
     </section>
 
-    <!-- MENU 3: STOK BARANG -->
+    <!-- MENU 3: STOK BARANG (HARGA REFERENSI PER ITEM) -->
     <section class="card hidden" id="menu-catalog">
       <div class="section-title">
         <span>Stok Barang</span>
@@ -1074,7 +884,7 @@
 
       <form id="addCatalogForm" class="sub-card sub-card-item" autocomplete="off">
         <div class="section-title" style="margin-bottom:8px;">
-          <span>Tambah Stok Barang</span>
+          <span>Tambah Harga Referensi Barang</span>
         </div>
 
         <div class="form-group">
@@ -1083,11 +893,6 @@
         </div>
 
         <div class="form-grid">
-          <div class="form-group">
-            <label for="newCatalogQty">Qty</label>
-            <input type="number" id="newCatalogQty" min="0.1" step="any" value="1" required />
-          </div>
-
           <div class="form-group">
             <label for="newCatalogUnit">Satuan</label>
             <select id="newCatalogUnit">
@@ -1102,21 +907,19 @@
               <option value="porsi">porsi</option>
             </select>
           </div>
-        </div>
 
-        <div class="form-grid">
           <div class="form-group">
             <label for="newCatalogPrice">Harga Satuan (Rp)</label>
             <input type="number" id="newCatalogPrice" min="1" step="any" placeholder="Contoh: 2000" required />
           </div>
-
-          <div class="form-group">
-            <label for="newCatalogBarcode">Barcode (Opsional)</label>
-            <input type="text" id="newCatalogBarcode" placeholder="Nomor barcode jika ada" />
-          </div>
         </div>
 
-        <button type="submit" class="btn btn-plus" id="saveCatalogBtn">+ Simpan ke Stok Barang</button>
+        <div class="form-group">
+          <label for="newCatalogBarcode">Barcode (Opsional)</label>
+          <input type="text" id="newCatalogBarcode" placeholder="Nomor barcode jika ada" />
+        </div>
+
+        <button type="submit" class="btn btn-plus" id="saveCatalogBtn">+ Simpan Harga Referensi</button>
       </form>
 
       <div class="table-wrap">
@@ -1124,7 +927,6 @@
           <thead>
             <tr>
               <th>Nama Barang</th>
-              <th>Qty</th>
               <th>Satuan</th>
               <th>Harga</th>
               <th>Aksi</th>
@@ -1134,7 +936,7 @@
         </table>
       </div>
       <div class="empty-box hidden" id="catalogEmptyState">
-        Belum ada stok barang terekam. Gunakan "Tambah Stok Barang" atau suara agar data & harga siap dipakai di Catatan Kas.
+        Belum ada harga referensi barang. Gunakan "Tambah Harga Referensi Barang" atau suara agar harga siap dipakai di Catatan Kas.
       </div>
     </section>
 
@@ -1142,7 +944,7 @@
     <section class="card hidden" id="menu-history">
       <div class="section-title">
         <span>Riwayat Hari Ini (Mulai 00:00)</span>
-        <span id="totalFilteredLabel" class="brand-sub">0 data</span>
+        <span id="totalFilteredLabel" class="brand-sub">0 item</span>
       </div>
 
       <div class="table-wrap">
@@ -1202,12 +1004,10 @@
   </div>
 
   <script>
-    const DEFAULT_SHEET_WEBAPP_URL = "";
+    const DEFAULT_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxiO6U6MxM1-UqZ68OcdVcDgcsL1Qdn-5B5Tt5B-p7KmPureDkJLldmG4QF6RDd2Zfa/exec";
 
-    const ACCOUNTS_KEY = "catat_warung_accounts_v1";
-    const SESSION_KEY = "catat_warung_active_session_v1";
-    const STORAGE_KEY = "catat_warung_eceran_v16";
-    const CATALOG_KEY = "catat_warung_toko_catalog_v11";
+    const STORAGE_KEY = "catat_warung_eceran_v17";
+    const CATALOG_KEY = "catat_warung_toko_catalog_v12";
 
     const HARI_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
     const BULAN_ID = [
@@ -1268,8 +1068,6 @@
     };
 
     const state = {
-      accounts: loadAccounts(),
-      session: loadSession(),
       transactions: [],
       storeItems: [],
       basket: [],
@@ -1285,32 +1083,9 @@
     const els = {
       toast: document.getElementById("toast"),
       printReportArea: document.getElementById("printReportArea"),
-      loginGate: document.getElementById("loginGate"),
-      authHeading: document.getElementById("authHeading"),
-      authSub: document.getElementById("authSub"),
-      authTabs: document.getElementById("authTabs"),
-      tabRegisterBtn: document.getElementById("tabRegisterBtn"),
-      tabLoginBtn: document.getElementById("tabLoginBtn"),
-      registerForm: document.getElementById("registerForm"),
-      regGmail: document.getElementById("regGmail"),
-      regPassword: document.getElementById("regPassword"),
-      regStoreName: document.getElementById("regStoreName"),
-      registerSubmitBtn: document.getElementById("registerSubmitBtn"),
-      loginForm: document.getElementById("loginForm"),
-      loginGmail: document.getElementById("loginGmail"),
-      loginPassword: document.getElementById("loginPassword"),
-      loginSubmitBtn: document.getElementById("loginSubmitBtn"),
-      openForgotBtn: document.getElementById("openForgotBtn"),
-      forgotForm: document.getElementById("forgotForm"),
-      forgotGmail: document.getElementById("forgotGmail"),
-      forgotStoreName: document.getElementById("forgotStoreName"),
-      forgotNewPassword: document.getElementById("forgotNewPassword"),
-      backToLoginBtn: document.getElementById("backToLoginBtn"),
-      resetPassSubmitBtn: document.getElementById("resetPassSubmitBtn"),
       mainApp: document.getElementById("mainApp"),
       topNav: document.getElementById("topNav"),
       activeStoreLabel: document.getElementById("activeStoreLabel"),
-      logoutBtn: document.getElementById("logoutBtn"),
       summaryDateDisplay: document.getElementById("summaryDateDisplay"),
       formDayDisplay: document.getElementById("formDayDisplay"),
       menus: {
@@ -1368,7 +1143,6 @@
       catalogCountLabel: document.getElementById("catalogCountLabel"),
       addCatalogForm: document.getElementById("addCatalogForm"),
       newCatalogName: document.getElementById("newCatalogName"),
-      newCatalogQty: document.getElementById("newCatalogQty"),
       newCatalogUnit: document.getElementById("newCatalogUnit"),
       newCatalogPrice: document.getElementById("newCatalogPrice"),
       newCatalogBarcode: document.getElementById("newCatalogBarcode"),
@@ -1594,7 +1368,7 @@
 
       const total = Math.round(qty * unitPrice);
       state.basket.push({ name, unit, qty, unitPrice, barcode, total });
-      upsertStoreItem({ name, qty, unit, price: unitPrice, barcode });
+      upsertStoreItem({ name, unit, price: unitPrice, barcode });
 
       els.itemName.value = "";
       els.itemQty.value = "1";
@@ -1714,10 +1488,6 @@
         els.newCatalogUnit.value = explicitUnit;
       }
 
-      if (extracted.qty !== null && extracted.qty > 0) {
-        els.newCatalogQty.value = extracted.qty;
-      }
-
       const matchedExisting = findMatchingStoreItem(extracted.rawName, targetUnit, Boolean(explicitUnit));
       const finalName = matchedExisting ? matchedExisting.name : extracted.rawName;
 
@@ -1737,11 +1507,11 @@
       }
 
       if (matchedExisting) {
-        showToast(`Cocok dengan catatan ${matchedExisting.name} (${matchedExisting.unit})`);
+        showToast(`Cocok dengan harga ${matchedExisting.name} (${matchedExisting.unit})`);
       } else if (explicitUnit) {
-        showToast(`Siap simpan ${finalName || "barang"} satuan ${explicitUnit}`);
+        showToast(`Siap simpan harga ${finalName || "barang"} (${explicitUnit})`);
       } else {
-        showToast("Suara terisi di stok barang — periksa & simpan");
+        showToast("Harga referensi terisi — periksa & simpan");
       }
     }
 
@@ -1881,7 +1651,7 @@
         rec.onstart = () => {
           const promptMsg =
             target === "catalog"
-              ? "Mendengarkan... sebutkan nama, sachet/renteng & harga (contoh: kopi kapal api 1 sachet harga 2000)"
+              ? "Mendengarkan... sebutkan nama, sachet/renteng & harga (contoh: kopi kapal api sachet harga 2000)"
               : "Mendengarkan... ucapkan 'tambah [nama barang] [qty] [sachet/renteng]'";
           setVoiceListeningUI(true, promptMsg, target);
         };
@@ -1911,53 +1681,9 @@
       }
     }
 
-    function loadAccounts() {
-      try {
-        const raw = localStorage.getItem(ACCOUNTS_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveAccounts() {
-      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(state.accounts));
-    }
-
-    function loadSession() {
-      try {
-        const raw = localStorage.getItem(SESSION_KEY);
-        const parsed = raw ? JSON.parse(raw) : null;
-        if (parsed && parsed.gmail) {
-          return parsed;
-        }
-        return null;
-      } catch {
-        return null;
-      }
-    }
-
-    function saveSession(sessionObj) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionObj));
-      state.session = sessionObj;
-    }
-
-    function clearSession() {
-      localStorage.removeItem(SESSION_KEY);
-      state.session = null;
-    }
-
-    function getScopedKey(baseKey) {
-      const accountKey = state.session?.gmail
-        ? String(state.session.gmail).trim().toLowerCase()
-        : "guest";
-      return `${baseKey}_${accountKey}`;
-    }
-
     function loadTransactions() {
       try {
-        const raw = localStorage.getItem(getScopedKey(STORAGE_KEY));
+        const raw = localStorage.getItem(STORAGE_KEY);
         const parsed = raw ? JSON.parse(raw) : [];
         return Array.isArray(parsed) ? parsed : [];
       } catch {
@@ -1966,12 +1692,12 @@
     }
 
     function saveTransactions() {
-      localStorage.setItem(getScopedKey(STORAGE_KEY), JSON.stringify(state.transactions));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions));
     }
 
     function loadStoreItems() {
       try {
-        const raw = localStorage.getItem(getScopedKey(CATALOG_KEY));
+        const raw = localStorage.getItem(CATALOG_KEY);
         const parsed = raw ? JSON.parse(raw) : [];
         return Array.isArray(parsed) ? parsed : [];
       } catch {
@@ -1980,7 +1706,7 @@
     }
 
     function saveStoreItems() {
-      localStorage.setItem(getScopedKey(CATALOG_KEY), JSON.stringify(state.storeItems));
+      localStorage.setItem(CATALOG_KEY, JSON.stringify(state.storeItems));
     }
 
     async function callSheetApi(payload) {
@@ -2011,251 +1737,7 @@
       return true;
     }
 
-    function setAuthTab(mode) {
-      els.authTabs.classList.remove("hidden");
-      els.forgotForm.classList.add("hidden");
-
-      const isRegister = mode === "register";
-      els.tabRegisterBtn.classList.toggle("active", isRegister);
-      els.tabLoginBtn.classList.toggle("active", !isRegister);
-      els.registerForm.classList.toggle("hidden", !isRegister);
-      els.loginForm.classList.toggle("hidden", isRegister);
-
-      if (isRegister) {
-        els.authHeading.textContent = "Daftar Akun Toko";
-        els.authSub.textContent = "Daftarkan Gmail, kata sandi, dan nama toko terlebih dahulu sebelum login.";
-      } else {
-        els.authHeading.textContent = "Login Pemilik Toko";
-        els.authSub.textContent = "Masuk memakai Gmail dan kata sandi yang sudah didaftarkan.";
-      }
-    }
-
-    function openForgotPasswordView() {
-      els.authTabs.classList.add("hidden");
-      els.registerForm.classList.add("hidden");
-      els.loginForm.classList.add("hidden");
-      els.forgotForm.classList.remove("hidden");
-
-      els.authHeading.textContent = "Lupa Kata Sandi";
-      els.authSub.textContent = "Verifikasi Gmail dan nama toko terdaftar untuk membuat kata sandi baru.";
-
-      if (els.loginGmail.value.trim()) {
-        els.forgotGmail.value = els.loginGmail.value.trim().toLowerCase();
-      }
-    }
-
-    function enterAppView() {
-      els.loginGate.classList.add("hidden");
-      els.mainApp.classList.remove("hidden");
-      els.topNav.classList.remove("hidden");
-      const label = state.session?.storeName
-        ? `${state.session.storeName}`
-        : state.session?.gmail || "Toko";
-      els.activeStoreLabel.textContent = `Kas • ${label}`;
-    }
-
-    function enterLoginView(preferredTab = null) {
-      els.mainApp.classList.add("hidden");
-      els.topNav.classList.add("hidden");
-      els.loginGate.classList.remove("hidden");
-
-      const targetTab = preferredTab || (state.accounts.length > 0 ? "login" : "register");
-      setAuthTab(targetTab);
-
-      if (state.session?.gmail) {
-        els.loginGmail.value = state.session.gmail;
-      }
-    }
-
-    els.tabRegisterBtn.addEventListener("click", () => setAuthTab("register"));
-    els.tabLoginBtn.addEventListener("click", () => setAuthTab("login"));
-    els.openForgotBtn.addEventListener("click", openForgotPasswordView);
-    els.backToLoginBtn.addEventListener("click", () => setAuthTab("login"));
-
-    els.forgotForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const gmail = els.forgotGmail.value.trim().toLowerCase();
-      const storeName = els.forgotStoreName.value.trim();
-      const newPassword = els.forgotNewPassword.value;
-
-      if (!gmail || !storeName || !newPassword) {
-        showToast("Lengkapi Gmail, nama toko, dan kata sandi baru");
-        return;
-      }
-
-      const accIdx = state.accounts.findIndex(
-        (acc) =>
-          String(acc.gmail || "").toLowerCase() === gmail &&
-          String(acc.storeName || "").trim().toLowerCase() === storeName.toLowerCase()
-      );
-
-      if (accIdx < 0) {
-        showToast("Gmail atau nama toko tidak cocok dengan akun terdaftar");
-        return;
-      }
-
-      state.accounts[accIdx] = {
-        ...state.accounts[accIdx],
-        password: newPassword,
-        updatedAt: new Date().toISOString()
-      };
-      saveAccounts();
-
-      if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
-        try {
-          await callSheetApi({
-            action: "register",
-            storeId: gmail,
-            gmail,
-            pin: newPassword,
-            storeName: state.accounts[accIdx].storeName
-          });
-        } catch {
-          // Tetap tersimpan lokal
-        }
-      }
-
-      els.forgotNewPassword.value = "";
-      els.loginGmail.value = gmail;
-      els.loginPassword.value = "";
-      setAuthTab("login");
-      showToast("Kata sandi berhasil diperbarui — silakan login");
-    });
-
-    els.registerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const gmail = els.regGmail.value.trim().toLowerCase();
-      const password = els.regPassword.value;
-      const storeName = els.regStoreName.value.trim();
-
-      if (!gmail || !gmail.includes("@") || !password || !storeName) {
-        showToast("Lengkapi Gmail, kata sandi, dan nama toko");
-        return;
-      }
-
-      const existingIdx = state.accounts.findIndex(
-        (acc) => String(acc.gmail || "").toLowerCase() === gmail
-      );
-
-      if (existingIdx >= 0) {
-        showToast("Gmail ini sudah terdaftar — silakan Login");
-        els.loginGmail.value = gmail;
-        setAuthTab("login");
-        return;
-      }
-
-      const newAccount = {
-        gmail,
-        password,
-        storeName,
-        createdAt: new Date().toISOString()
-      };
-
-      state.accounts.push(newAccount);
-      saveAccounts();
-
-      if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
-        try {
-          await callSheetApi({
-            action: "register",
-            storeId: gmail,
-            gmail,
-            pin: password,
-            storeName
-          });
-        } catch {
-          // Tetap tersimpan di akun lokal
-        }
-      }
-
-      els.regGmail.value = "";
-      els.regPassword.value = "";
-      els.regStoreName.value = "";
-      els.loginGmail.value = gmail;
-      els.loginPassword.value = "";
-      setAuthTab("login");
-      showToast("Pendaftaran berhasil — silakan login");
-    });
-
-    els.loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const gmail = els.loginGmail.value.trim().toLowerCase();
-      const password = els.loginPassword.value;
-
-      if (!gmail || !gmail.includes("@") || !password) {
-        showToast("Masukkan Gmail dan kata sandi");
-        return;
-      }
-
-      const foundAccount = state.accounts.find(
-        (acc) => String(acc.gmail || "").toLowerCase() === gmail
-      );
-
-      if (!foundAccount) {
-        showToast("Akun belum terdaftar — silakan Daftar dulu");
-        els.regGmail.value = gmail;
-        setAuthTab("register");
-        return;
-      }
-
-      if (foundAccount.password !== password) {
-        showToast("Kata sandi salah — klik Lupa Kata Sandi jika lupa");
-        return;
-      }
-
-      els.loginSubmitBtn.disabled = true;
-      els.loginSubmitBtn.textContent = "Masuk...";
-
-      try {
-        saveSession({
-          gmail: foundAccount.gmail,
-          storeName: foundAccount.storeName
-        });
-
-        state.transactions = loadTransactions();
-        state.storeItems = loadStoreItems();
-
-        if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
-          try {
-            const res = await callSheetApi({
-              action: "login",
-              storeId: foundAccount.gmail,
-              gmail: foundAccount.gmail,
-              pin: foundAccount.password,
-              storeName: foundAccount.storeName
-            });
-            applyCloudPayload(res);
-          } catch {
-            // Gunakan data lokal bila offline
-          }
-        }
-
-        enterAppView();
-        await resetForm("income");
-        if (!els.printCalendarDate.value) {
-          els.printCalendarDate.value = getTodayISO();
-        }
-        updatePrintSelectionSummary();
-        renderCatalogTable();
-        await switchMenu("menu-summary");
-        renderSummary();
-        renderTable();
-        showToast(`Selamat datang di ${foundAccount.storeName}`);
-      } finally {
-        els.loginSubmitBtn.disabled = false;
-        els.loginSubmitBtn.textContent = "Masuk ke Toko";
-      }
-    });
-
-    els.logoutBtn.addEventListener("click", async () => {
-      stopVoiceRecognition();
-      await stopScanner();
-      clearSession();
-      enterLoginView("login");
-      showToast("Anda telah keluar");
-    });
-
-    function upsertStoreItem({ name, qty = null, unit, price, barcode = "" }) {
+    function upsertStoreItem({ name, unit, price, barcode = "" }) {
       const rawName = String(name || "").trim();
       const cleanUnit = String(unit || "sachet").trim();
       const cleanPrice = Number(price || 0);
@@ -2291,12 +1773,9 @@
       let savedObj;
       if (existingIdx >= 0) {
         const earlierItem = state.storeItems[existingIdx];
-        const prevQty = Number(earlierItem.qty ?? 1);
-        const nextQty = qty !== null && Number(qty) > 0 ? Number(qty) : prevQty;
         savedObj = {
           ...earlierItem,
           name: earlierItem.name,
-          qty: nextQty,
           unit: earlierItem.unit,
           price: cleanPrice,
           barcode: cleanBarcode || earlierItem.barcode || ""
@@ -2306,7 +1785,6 @@
         savedObj = {
           id: "item_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
           name: rawName,
-          qty: qty !== null && Number(qty) > 0 ? Number(qty) : 1,
           unit: cleanUnit,
           price: cleanPrice,
           barcode: cleanBarcode
@@ -2323,35 +1801,33 @@
       e.preventDefault();
       stopVoiceRecognition();
       const name = els.newCatalogName.value.trim();
-      const qty = Number(els.newCatalogQty.value || 1);
       const unit = els.newCatalogUnit.value;
       const price = Number(els.newCatalogPrice.value || 0);
       const barcode = els.newCatalogBarcode.value.trim();
 
-      if (!name || qty <= 0 || price <= 0) {
-        showToast("Isi nama barang, qty, dan harga satuan");
+      if (!name || price <= 0) {
+        showToast("Isi nama barang dan harga satuan");
         return;
       }
 
       const matchedSameUnit = findMatchingStoreItem(name, unit, true);
-      const savedItem = upsertStoreItem({ name, qty, unit, price, barcode });
+      const savedItem = upsertStoreItem({ name, unit, price, barcode });
       els.newCatalogName.value = "";
-      els.newCatalogQty.value = "1";
       els.newCatalogPrice.value = "";
       els.newCatalogBarcode.value = "";
       els.catalogVoiceStatusBar.classList.add("hidden");
       els.newCatalogName.focus();
       showToast(
         matchedSameUnit
-          ? `Diperbarui pada ${matchedSameUnit.name} (${unit})`
-          : `Tersimpan: ${name} (${unit})`
+          ? `Harga diperbarui: ${matchedSameUnit.name} (${unit})`
+          : `Harga tersimpan: ${name} (${unit})`
       );
 
       if (savedItem && String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
         try {
           const res = await callSheetApi({
             action: "saveTransaction",
-            storeId: state.session?.gmail || "",
+            storeId: "default_store",
             itemsToRecord: [savedItem]
           });
           applyCloudPayload(res);
@@ -2739,14 +2215,12 @@
           const codeSub = item.barcode
             ? `<div class="brand-sub">#${escapeHtml(item.barcode)}</div>`
             : "";
-          const qtyVal = item.qty ?? 1;
           return `
             <tr>
               <td>
                 <strong>${escapeHtml(item.name)}</strong>
                 ${codeSub}
               </td>
-              <td><strong>${escapeHtml(qtyVal)}</strong></td>
               <td>${escapeHtml(item.unit)}</td>
               <td><strong class="income-text">${formatRupiah(item.price)}</strong></td>
               <td>
@@ -2774,16 +2248,16 @@
     };
 
     window.deleteStoreItem = async function (id) {
-      const ok = confirm("Hapus barang ini dari stok?");
+      const ok = confirm("Hapus harga referensi barang ini?");
       if (!ok) return;
       state.storeItems = state.storeItems.filter((i) => i.id !== id);
       saveStoreItems();
       renderCatalogTable();
-      showToast("Stok barang dihapus");
+      showToast("Harga referensi dihapus");
       try {
         const res = await callSheetApi({
           action: "deleteItem",
-          storeId: state.session?.gmail || "",
+          storeId: "default_store",
           id
         });
         applyCloudPayload(res);
@@ -2861,68 +2335,144 @@
       }];
     }
 
+    function expandTransactionsPerItem(txList) {
+      const rows = [];
+      for (const trx of txList) {
+        const isExpense = trx.type === "expense";
+        const metaParts = [];
+        if (trx.category) metaParts.push(trx.category);
+        if (trx.note) metaParts.push(trx.note);
+        const metaText = metaParts.join(" • ");
+
+        if (isExpense) {
+          rows.push({
+            trxId: trx.id,
+            date: trx.date,
+            createdAt: trx.createdAt || "",
+            type: "expense",
+            isSingleItemTrx: true,
+            itemName: trx.category || "Pengeluaran",
+            qty: 1,
+            unit: "",
+            unitPrice: Math.round(Number(trx.amount || 0)),
+            total: Math.round(Number(trx.amount || 0)),
+            barcode: "",
+            metaText
+          });
+        } else {
+          const lines = getTransactionLineItems(trx);
+          const isSingleItemTrx = lines.length === 1;
+          lines.forEach((line, idx) => {
+            rows.push({
+              trxId: trx.id,
+              itemIndex: idx,
+              date: trx.date,
+              createdAt: trx.createdAt || "",
+              type: "income",
+              isSingleItemTrx,
+              itemName: line.name,
+              qty: line.qty,
+              unit: line.unit,
+              unitPrice: line.unitPrice,
+              total: Math.round(Number(line.total || 0)),
+              barcode: line.barcode || "",
+              metaText
+            });
+          });
+        }
+      }
+      return rows;
+    }
+
     function getTodayMidnightHistoryTransactions() {
       const todayISO = getTodayISO();
-      return state.transactions
+      const todayTx = state.transactions
         .filter((item) => item.date === todayISO)
         .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      return expandTransactionsPerItem(todayTx);
     }
 
     function renderTable() {
-      const items = getTodayMidnightHistoryTransactions();
-      els.totalFilteredLabel.textContent = `${items.length} data`;
+      const rows = getTodayMidnightHistoryTransactions();
+      els.totalFilteredLabel.textContent = `${rows.length} item`;
 
-      if (items.length === 0) {
+      if (rows.length === 0) {
         els.trxTableBody.innerHTML = "";
         els.emptyState.classList.remove("hidden");
         return;
       }
 
       els.emptyState.classList.add("hidden");
-      els.trxTableBody.innerHTML = items
-        .map((item) => {
-          const isExpense = item.type === "expense";
+      els.trxTableBody.innerHTML = rows
+        .map((row) => {
+          const isExpense = row.type === "expense";
           const badgeClass = isExpense ? "badge-expense" : "badge-income";
           const badgeText = isExpense ? "Keluar" : "Masuk";
           const amtClass = isExpense ? "expense-text" : "income-text";
           const prefixSign = isExpense ? "-" : "+";
 
-          const lines = getTransactionLineItems(item);
-          const metaParts = [];
-          if (item.category) metaParts.push(escapeHtml(item.category));
-          if (item.note) metaParts.push(escapeHtml(item.note));
-          const metaHtml = metaParts.length
-            ? `<div class="brand-sub" style="margin-top:2px;">${metaParts.join(" • ")}</div>`
-            : "";
+          const codeNote = row.barcode ? ` (#${escapeHtml(row.barcode)})` : "";
+          const detailMain = isExpense
+            ? `<strong>${escapeHtml(row.itemName)}</strong>${row.metaText ? " • " + escapeHtml(row.metaText) : ""}`
+            : `<strong>${escapeHtml(row.itemName)}</strong>${codeNote} — ${escapeHtml(row.qty)} ${escapeHtml(row.unit)} × ${formatRupiah(row.unitPrice)}${row.metaText ? `<div class="brand-sub" style="margin-top:2px;">${escapeHtml(row.metaText)}</div>` : ""}`;
 
-          const rincianHtml = isExpense
-            ? `<div class="rincian-line"><strong>${escapeHtml(item.category || "Pengeluaran")}</strong>${item.note ? " • " + escapeHtml(item.note) : ""}</div>`
-            : lines
-                .map((x) => {
-                  const codeNote = x.barcode ? ` (#${escapeHtml(x.barcode)})` : "";
-                  return `<div class="rincian-line">• <strong>${escapeHtml(x.name)}</strong>${codeNote} — ${escapeHtml(x.qty)} ${escapeHtml(x.unit)} × ${formatRupiah(x.unitPrice)} = <strong>${formatRupiah(x.total)}</strong></div>`;
-                })
-                .join("");
+          const actionHtml = row.isSingleItemTrx
+            ? `<div class="row-actions">
+                 <button type="button" class="icon-btn" onclick="startEdit('${escapeHtml(row.trxId)}')">Edit</button>
+                 <button type="button" class="icon-btn del" onclick="removeTrx('${escapeHtml(row.trxId)}')">Hapus</button>
+               </div>`
+            : `<div class="row-actions">
+                 <button type="button" class="icon-btn del" onclick="removeItemFromTrx('${escapeHtml(row.trxId)}', ${row.itemIndex})">Hapus</button>
+               </div>`;
 
           return `
             <tr>
               <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-              <td>
-                ${rincianHtml}
-                ${metaHtml}
-              </td>
-              <td class="${amtClass}"><strong>${prefixSign}${formatRupiah(item.amount)}</strong></td>
-              <td>
-                <div class="row-actions">
-                  <button type="button" class="icon-btn" onclick="startEdit('${escapeHtml(item.id)}')">Edit</button>
-                  <button type="button" class="icon-btn del" onclick="removeTrx('${escapeHtml(item.id)}')">Hapus</button>
-                </div>
-              </td>
+              <td><div class="rincian-line">${detailMain}</div></td>
+              <td class="${amtClass}"><strong>${prefixSign}${formatRupiah(row.total)}</strong></td>
+              <td>${actionHtml}</td>
             </tr>
           `;
         })
         .join("");
     }
+
+    window.removeItemFromTrx = async function (trxId, itemIndex) {
+      const targetTrx = state.transactions.find((t) => t.id === trxId);
+      if (!targetTrx) return;
+
+      const lines = getTransactionLineItems(targetTrx);
+      const removedLine = lines[itemIndex];
+      const label = removedLine ? `${removedLine.name} (${removedLine.qty} ${removedLine.unit})` : "item ini";
+      const ok = confirm(`Hapus ${label} dari riwayat?`);
+      if (!ok) return;
+
+      const remaining = lines.filter((_, idx) => idx !== itemIndex);
+      if (remaining.length === 0) {
+        state.transactions = state.transactions.filter((t) => t.id !== trxId);
+        showToast("Item & transaksi dihapus");
+      } else {
+        const nextTotal = remaining.reduce((sum, x) => sum + Math.round(Number(x.total || 0)), 0);
+        const first = remaining[0];
+        state.transactions = state.transactions.map((t) =>
+          t.id === trxId
+            ? {
+                ...t,
+                items: remaining,
+                amount: nextTotal,
+                itemName: remaining.length === 1 ? first.name : "",
+                unit: remaining.length === 1 ? first.unit : "",
+                qty: remaining.length === 1 ? first.qty : null,
+                unitPrice: remaining.length === 1 ? first.unitPrice : null,
+                barcode: remaining.length === 1 ? (first.barcode || "") : ""
+              }
+            : t
+        );
+        showToast("Item dihapus");
+      }
+
+      refreshAll();
+    };
 
     function updatePrintSelectionSummary() {
       const flow = els.printFlowType.value;
@@ -2972,29 +2522,28 @@
         })
         .sort((a, b) => String(a.date).localeCompare(String(b.date)));
 
+      const expandedRows = expandTransactionsPerItem(matched);
+
       let totalIncome = 0;
       let totalExpense = 0;
       const rowsHtml = [];
 
-      for (const trx of matched) {
-        const isExpense = trx.type === "expense";
-        const amt = Math.round(Number(trx.amount || 0));
+      for (const row of expandedRows) {
+        const isExpense = row.type === "expense";
+        const amt = Math.round(Number(row.total || 0));
         if (isExpense) {
           totalExpense += amt;
         } else {
           totalIncome += amt;
         }
 
-        const lines = getTransactionLineItems(trx);
         const descText = isExpense
-          ? `${trx.category || "Pengeluaran"}${trx.note ? " (" + trx.note + ")" : ""}`
-          : lines
-              .map((x) => `${x.name} (${x.qty} ${x.unit} × ${formatRupiah(x.unitPrice)})`)
-              .join(", ") + (trx.note ? ` • ${trx.note}` : "");
+          ? `${row.itemName}${row.metaText ? " (" + row.metaText + ")" : ""}`
+          : `${row.itemName} — ${row.qty} ${row.unit} × ${formatRupiah(row.unitPrice)}${row.metaText ? " • " + row.metaText : ""}`;
 
         rowsHtml.push(`
           <tr>
-            <td>${escapeHtml(formatDayAndDDMMYY(trx.date))}</td>
+            <td>${escapeHtml(formatDayAndDDMMYY(row.date))}</td>
             <td>${isExpense ? "Pengeluaran" : "Pemasukan"}</td>
             <td>${escapeHtml(descText)}</td>
             <td>${isExpense ? "-" : "+"}${formatRupiah(amt)}</td>
@@ -3011,7 +2560,7 @@
 
       els.printReportArea.innerHTML = `
         <div class="print-title">Laporan ${escapeHtml(flowLabel)} — ${escapeHtml(periodLabel)}</div>
-        <div class="print-meta">Toko: ${escapeHtml(state.session?.storeName || state.session?.gmail || "-")} • Dicetak: ${escapeHtml(formatDayAndDDMMYY(getTodayISO()))} • Jumlah Data: ${rowsHtml.length}</div>
+        <div class="print-meta">Toko • Dicetak: ${escapeHtml(formatDayAndDDMMYY(getTodayISO()))} • Jumlah Item: ${rowsHtml.length}</div>
         <table class="print-table">
           <thead>
             <tr>
@@ -3090,7 +2639,7 @@
       try {
         const res = await callSheetApi({
           action: "deleteTransaction",
-          storeId: state.session?.gmail || "",
+          storeId: "default_store",
           id
         });
         applyCloudPayload(res);
@@ -3342,7 +2891,7 @@
         try {
           const res = await callSheetApi({
             action: "saveTransaction",
-            storeId: state.session?.gmail || "",
+            storeId: "default_store",
             transaction: trxRecord,
             itemsToRecord: recordedItems
           });
@@ -3356,14 +2905,9 @@
     });
 
     async function init() {
-      if (!state.session) {
-        enterLoginView();
-        return;
-      }
-
+      els.activeStoreLabel.textContent = "Ringkasan Kas";
       state.transactions = loadTransactions();
       state.storeItems = loadStoreItems();
-      enterAppView();
       await resetForm("income");
       if (!els.printCalendarDate.value) {
         els.printCalendarDate.value = getTodayISO();
