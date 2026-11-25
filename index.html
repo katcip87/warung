@@ -329,6 +329,42 @@
       background: #0369a1;
     }
 
+    .btn-voice {
+      background: #7c3aed;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-voice:hover {
+      background: #6d28d9;
+    }
+
+    .btn-voice.listening {
+      background: #dc2626;
+      animation: pulseVoice 1s infinite;
+    }
+
+    @keyframes pulseVoice {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    .voice-status-bar {
+      background: #f5f3ff;
+      border: 1px solid #c4b5fd;
+      color: #4c1d95;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
     .btn-sm {
       border: 1px solid var(--border);
       background: var(--surface);
@@ -838,7 +874,7 @@
     <nav class="top-nav" id="topNav" aria-label="Menu Utama">
       <button type="button" class="nav-btn active" data-menu="menu-summary">Ringkasan</button>
       <button type="button" class="nav-btn" data-menu="menu-form">Catatan Kas</button>
-      <button type="button" class="nav-btn" data-menu="menu-catalog">Barang</button>
+      <button type="button" class="nav-btn" data-menu="menu-catalog">Stok Barang</button>
       <button type="button" class="nav-btn" data-menu="menu-history">Riwayat</button>
       <button type="button" class="nav-btn" data-menu="menu-print">Print</button>
     </nav>
@@ -883,8 +919,13 @@
     <section class="card hidden" id="menu-form">
       <div class="section-title">
         <span id="formHeading">Catatan Kas</span>
-        <button type="button" class="btn-sm hidden" id="cancelEditBtn">Batal Edit</button>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button type="button" class="btn-voice" id="voiceInputBtn">Suara</button>
+          <button type="button" class="btn-sm hidden" id="cancelEditBtn">Batal Edit</button>
+        </div>
       </div>
+
+      <div class="voice-status-bar hidden" id="voiceStatusBar">-</div>
 
       <form id="trxForm" autocomplete="off">
         <input type="hidden" id="editId" value="" />
@@ -1019,16 +1060,21 @@
       </form>
     </section>
 
-    <!-- MENU 3: BARANG -->
+    <!-- MENU 3: STOK BARANG -->
     <section class="card hidden" id="menu-catalog">
       <div class="section-title">
-        <span>Barang</span>
-        <span id="catalogCountLabel" class="brand-sub">0 barang</span>
+        <span>Stok Barang</span>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button type="button" class="btn-voice" id="catalogVoiceBtn">Suara</button>
+          <span id="catalogCountLabel" class="brand-sub">0 barang</span>
+        </div>
       </div>
+
+      <div class="voice-status-bar hidden" id="catalogVoiceStatusBar">-</div>
 
       <form id="addCatalogForm" class="sub-card sub-card-item" autocomplete="off">
         <div class="section-title" style="margin-bottom:8px;">
-          <span>Tambah Daftar Barang</span>
+          <span>Tambah Stok Barang</span>
         </div>
 
         <div class="form-group">
@@ -1037,6 +1083,11 @@
         </div>
 
         <div class="form-grid">
+          <div class="form-group">
+            <label for="newCatalogQty">Qty</label>
+            <input type="number" id="newCatalogQty" min="0.1" step="any" value="1" required />
+          </div>
+
           <div class="form-group">
             <label for="newCatalogUnit">Satuan</label>
             <select id="newCatalogUnit">
@@ -1051,19 +1102,21 @@
               <option value="porsi">porsi</option>
             </select>
           </div>
+        </div>
 
+        <div class="form-grid">
           <div class="form-group">
             <label for="newCatalogPrice">Harga Satuan (Rp)</label>
             <input type="number" id="newCatalogPrice" min="1" step="any" placeholder="Contoh: 2000" required />
           </div>
+
+          <div class="form-group">
+            <label for="newCatalogBarcode">Barcode (Opsional)</label>
+            <input type="text" id="newCatalogBarcode" placeholder="Nomor barcode jika ada" />
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="newCatalogBarcode">Barcode (Opsional)</label>
-          <input type="text" id="newCatalogBarcode" placeholder="Nomor barcode jika ada" />
-        </div>
-
-        <button type="submit" class="btn btn-plus" id="saveCatalogBtn">+ Simpan ke Daftar Barang</button>
+        <button type="submit" class="btn btn-plus" id="saveCatalogBtn">+ Simpan ke Stok Barang</button>
       </form>
 
       <div class="table-wrap">
@@ -1071,6 +1124,7 @@
           <thead>
             <tr>
               <th>Nama Barang</th>
+              <th>Qty</th>
               <th>Satuan</th>
               <th>Harga</th>
               <th>Aksi</th>
@@ -1080,7 +1134,7 @@
         </table>
       </div>
       <div class="empty-box hidden" id="catalogEmptyState">
-        Belum ada barang terekam. Gunakan "Tambah Daftar Barang" atau catat transaksi agar harga tersimpan otomatis.
+        Belum ada stok barang terekam. Gunakan "Tambah Stok Barang" atau suara agar data & harga siap dipakai di Catatan Kas.
       </div>
     </section>
 
@@ -1173,6 +1227,46 @@
       expense: ["Cash", "Bon"]
     };
 
+    const KNOWN_UNITS = [
+      "sachet", "renteng", "bungkus", "pcs", "botol", "kg", "gram", "liter", "porsi"
+    ];
+
+    const SPOKEN_UNIT_SYNONYMS = {
+      sachet: "sachet",
+      saset: "sachet",
+      sacet: "sachet",
+      sace: "sachet",
+      renteng: "renteng",
+      renting: "renteng",
+      ranteng: "renteng",
+      renteg: "renteng",
+      bungkus: "bungkus",
+      pcs: "pcs",
+      pis: "pcs",
+      botol: "botol",
+      kg: "kg",
+      kilo: "kg",
+      kilogram: "kg",
+      gram: "gram",
+      liter: "liter",
+      porsi: "porsi"
+    };
+
+    const INDONESIAN_NUMBER_WORDS = {
+      satu: 1, se: 1,
+      dua: 2,
+      tiga: 3,
+      empat: 4,
+      lima: 5,
+      enam: 6,
+      tujuh: 7,
+      delapan: 8,
+      sembilan: 9,
+      sepuluh: 10,
+      sebelas: 11,
+      setengah: 0.5
+    };
+
     const state = {
       accounts: loadAccounts(),
       session: loadSession(),
@@ -1182,7 +1276,10 @@
       period: "today",
       activeMenu: "menu-summary",
       scannerInstance: null,
-      isScanning: false
+      isScanning: false,
+      recognitionInstance: null,
+      isListeningVoice: false,
+      voiceTarget: "trx"
     };
 
     const els = {
@@ -1231,6 +1328,8 @@
       quickIncomeBtn: document.getElementById("quickIncomeBtn"),
       quickExpenseBtn: document.getElementById("quickExpenseBtn"),
       formHeading: document.getElementById("formHeading"),
+      voiceInputBtn: document.getElementById("voiceInputBtn"),
+      voiceStatusBar: document.getElementById("voiceStatusBar"),
       cancelEditBtn: document.getElementById("cancelEditBtn"),
       trxForm: document.getElementById("trxForm"),
       editId: document.getElementById("editId"),
@@ -1264,9 +1363,12 @@
       finalAmountPreview: document.getElementById("finalAmountPreview"),
       submitTrxBtn: document.getElementById("submitTrxBtn"),
 
+      catalogVoiceBtn: document.getElementById("catalogVoiceBtn"),
+      catalogVoiceStatusBar: document.getElementById("catalogVoiceStatusBar"),
       catalogCountLabel: document.getElementById("catalogCountLabel"),
       addCatalogForm: document.getElementById("addCatalogForm"),
       newCatalogName: document.getElementById("newCatalogName"),
+      newCatalogQty: document.getElementById("newCatalogQty"),
       newCatalogUnit: document.getElementById("newCatalogUnit"),
       newCatalogPrice: document.getElementById("newCatalogPrice"),
       newCatalogBarcode: document.getElementById("newCatalogBarcode"),
@@ -1353,6 +1455,460 @@
       showToast._timer = setTimeout(() => {
         els.toast.classList.remove("show");
       }, 2400);
+    }
+
+    function normalizePhrase(str) {
+      return String(str || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function resolveUnitWord(rawWord) {
+      const clean = String(rawWord || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!clean) return "";
+      if (SPOKEN_UNIT_SYNONYMS[clean]) return SPOKEN_UNIT_SYNONYMS[clean];
+      if (KNOWN_UNITS.includes(clean)) return clean;
+      return "";
+    }
+
+    function findMatchingStoreItem(spokenOrTypedName, preferredUnit = "", strictUnit = false) {
+      const normQuery = normalizePhrase(spokenOrTypedName);
+      if (!normQuery || state.storeItems.length === 0) return null;
+
+      const unitNorm = normalizePhrase(preferredUnit);
+      const pool = unitNorm
+        ? state.storeItems.filter((item) => normalizePhrase(item.unit) === unitNorm)
+        : state.storeItems;
+
+      if (strictUnit && unitNorm && pool.length === 0) {
+        return null;
+      }
+
+      const candidates = pool.length > 0 ? pool : state.storeItems;
+      const chronologicalItems = [...candidates].reverse();
+
+      const exactMatches = chronologicalItems.filter(
+        (item) => normalizePhrase(item.name) === normQuery
+      );
+      if (exactMatches.length > 0) {
+        return exactMatches[0];
+      }
+
+      const substringMatches = chronologicalItems.filter((item) => {
+        const existingNorm = normalizePhrase(item.name);
+        if (!existingNorm) return false;
+        return existingNorm.includes(normQuery) || normQuery.includes(existingNorm);
+      });
+
+      if (substringMatches.length > 0) {
+        return substringMatches[0];
+      }
+
+      const queryTokens = normQuery.split(" ").filter((t) => t.length >= 2);
+      if (queryTokens.length > 0) {
+        const tokenMatches = chronologicalItems.filter((item) => {
+          const existingTokens = normalizePhrase(item.name).split(" ");
+          return queryTokens.every((qt) => existingTokens.includes(qt));
+        });
+        if (tokenMatches.length > 0) {
+          return tokenMatches[0];
+        }
+      }
+
+      return null;
+    }
+
+    function parseIndonesianRupiah(spokenText) {
+      const text = String(spokenText || "").toLowerCase().trim();
+      if (!text) return 0;
+
+      const directNumMatch = text.match(/(\d+(?:[.,]\d+)?)\s*(ribu|rb|k|juta|jt)?/);
+      if (directNumMatch) {
+        const baseVal = parseFloat(directNumMatch[1].replace(",", "."));
+        const unitWord = directNumMatch[2] || "";
+        if (!Number.isNaN(baseVal)) {
+          if (unitWord === "ribu" || unitWord === "rb" || unitWord === "k") {
+            return Math.round(baseVal * 1000);
+          }
+          if (unitWord === "juta" || unitWord === "jt") {
+            return Math.round(baseVal * 1000000);
+          }
+          if (baseVal >= 100) {
+            return Math.round(baseVal);
+          }
+        }
+      }
+
+      let total = 0;
+      let current = 0;
+      const tokens = text.split(/\s+/);
+      for (const tok of tokens) {
+        if (tok === "ribu" || tok === "rb") {
+          total += (current || 1) * 1000;
+          current = 0;
+        } else if (tok === "ratus" || tok === "seratus") {
+          current += tok === "seratus" ? 100 : (current || 1) * 100;
+        } else if (tok === "puluh" || tok === "sepuluh") {
+          current += tok === "sepuluh" ? 10 : (current || 1) * 10;
+        } else if (INDONESIAN_NUMBER_WORDS[tok] !== undefined) {
+          current += INDONESIAN_NUMBER_WORDS[tok];
+        }
+      }
+      total += current;
+      return Math.round(total);
+    }
+
+    function parseSpokenQty(tokenStr) {
+      if (!tokenStr) return null;
+      const clean = String(tokenStr).toLowerCase().trim();
+      if (/^\d+(?:[.,]\d+)?$/.test(clean)) {
+        const val = parseFloat(clean.replace(",", "."));
+        return val > 0 ? val : null;
+      }
+      if (INDONESIAN_NUMBER_WORDS[clean] !== undefined) {
+        return INDONESIAN_NUMBER_WORDS[clean];
+      }
+      return null;
+    }
+
+    function addCurrentItemToBasket(customName = "", customUnit = "", customQty = null, customPrice = null) {
+      const rawName = (customName !== "" ? customName : els.itemName.value).trim();
+      const unit = customUnit !== "" ? customUnit : els.itemUnit.value;
+      const matchedExisting = findMatchingStoreItem(rawName, unit, true);
+      const name = matchedExisting ? matchedExisting.name : rawName;
+      const qty = customQty !== null ? Number(customQty) : Number(els.itemQty.value || 0);
+      const unitPrice = customPrice !== null ? Number(customPrice) : Number(els.unitPrice.value || 0);
+      const barcode = els.scannedBarcode.value.trim();
+
+      if (!name) {
+        showToast("Isi nama barang dulu");
+        els.itemName.focus();
+        return false;
+      }
+      if (qty <= 0 || unitPrice <= 0) {
+        showToast("Isi qty dan harga satuan dulu");
+        return false;
+      }
+
+      const total = Math.round(qty * unitPrice);
+      state.basket.push({ name, unit, qty, unitPrice, barcode, total });
+      upsertStoreItem({ name, qty, unit, price: unitPrice, barcode });
+
+      els.itemName.value = "";
+      els.itemQty.value = "1";
+      els.unitPrice.value = "";
+      setBarcodeBadge("");
+      hideSuggestions();
+      renderBasket();
+      updateAmountCalculation();
+      els.itemName.focus();
+      showToast(`Ditambahkan ke ${name} (${unit})`);
+      return true;
+    }
+
+    function extractItemDetailsFromWords(words) {
+      let foundUnitIdx = -1;
+      let foundUnit = "";
+      for (let i = 0; i < words.length; i++) {
+        const resolved = resolveUnitWord(words[i]);
+        if (resolved) {
+          foundUnitIdx = i;
+          foundUnit = resolved;
+          break;
+        }
+      }
+
+      let qtyVal = null;
+      let nameWords = [...words];
+
+      if (foundUnitIdx >= 0) {
+        if (foundUnitIdx > 0) {
+          const maybeQty = parseSpokenQty(words[foundUnitIdx - 1]);
+          if (maybeQty !== null) {
+            qtyVal = maybeQty;
+            nameWords = words.slice(0, foundUnitIdx - 1);
+          } else {
+            nameWords = words.slice(0, foundUnitIdx);
+          }
+        } else {
+          nameWords = words.slice(1);
+        }
+      } else {
+        for (let i = words.length - 1; i >= 0; i--) {
+          const maybeQty = parseSpokenQty(words[i]);
+          if (maybeQty !== null && i > 0) {
+            qtyVal = maybeQty;
+            nameWords = words.slice(0, i);
+            break;
+          }
+        }
+      }
+
+      return {
+        unit: foundUnit,
+        qty: qtyVal,
+        rawName: nameWords.join(" ").trim()
+      };
+    }
+
+    function extractPriceFromCatalogWords(words) {
+      const lower = words.join(" ").toLowerCase();
+      const priceMarkerMatch = lower.match(/\b(?:harga|rp|rupiah)\b\s+(.+)/);
+      if (priceMarkerMatch) {
+        const pricePart = priceMarkerMatch[1];
+        const parsed = parseIndonesianRupiah(pricePart);
+        if (parsed > 0) {
+          const strippedWords = lower
+            .replace(priceMarkerMatch[0], " ")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+          return { price: parsed, remainingWords: strippedWords };
+        }
+      }
+
+      const unitScaleMatch = lower.match(/(\d+(?:[.,]\d+)?)\s*(ribu|rb|k|juta|jt)\b/);
+      if (unitScaleMatch) {
+        const parsed = parseIndonesianRupiah(unitScaleMatch[0]);
+        if (parsed > 0) {
+          const strippedWords = lower
+            .replace(unitScaleMatch[0], " ")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+          return { price: parsed, remainingWords: strippedWords };
+        }
+      }
+
+      const lastToken = words[words.length - 1] || "";
+      if (/^\d{3,}$/.test(lastToken)) {
+        return {
+          price: Number(lastToken),
+          remainingWords: words.slice(0, -1)
+        };
+      }
+
+      return { price: 0, remainingWords: words };
+    }
+
+    function applySpokenTranscriptToCatalog(transcript) {
+      const cleanTranscript = String(transcript || "").trim();
+      if (!cleanTranscript) return;
+
+      els.catalogVoiceStatusBar.classList.remove("hidden");
+      els.catalogVoiceStatusBar.textContent = `Ter dengar: "${cleanTranscript}"`;
+
+      let words = cleanTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+      if (words.length > 0 && words[0].replace(/[^a-z]/g, "") === "tambah") {
+        words = words.slice(1);
+      }
+
+      const priceInfo = extractPriceFromCatalogWords(words);
+      const extracted = extractItemDetailsFromWords(priceInfo.remainingWords);
+      const explicitUnit = extracted.unit || "";
+      const targetUnit = explicitUnit || els.newCatalogUnit.value;
+
+      if (explicitUnit) {
+        els.newCatalogUnit.value = explicitUnit;
+      }
+
+      if (extracted.qty !== null && extracted.qty > 0) {
+        els.newCatalogQty.value = extracted.qty;
+      }
+
+      const matchedExisting = findMatchingStoreItem(extracted.rawName, targetUnit, Boolean(explicitUnit));
+      const finalName = matchedExisting ? matchedExisting.name : extracted.rawName;
+
+      if (finalName) {
+        els.newCatalogName.value = finalName;
+      }
+
+      if (priceInfo.price > 0) {
+        els.newCatalogPrice.value = priceInfo.price;
+      } else if (matchedExisting && Number(matchedExisting.price) > 0 && !els.newCatalogPrice.value) {
+        els.newCatalogPrice.value = matchedExisting.price;
+      } else if (!explicitUnit && !matchedExisting) {
+        const anyNameMatch = findMatchingStoreItem(extracted.rawName, "", false);
+        if (anyNameMatch && Number(anyNameMatch.price) > 0 && !els.newCatalogPrice.value) {
+          els.newCatalogPrice.value = anyNameMatch.price;
+        }
+      }
+
+      if (matchedExisting) {
+        showToast(`Cocok dengan catatan ${matchedExisting.name} (${matchedExisting.unit})`);
+      } else if (explicitUnit) {
+        showToast(`Siap simpan ${finalName || "barang"} satuan ${explicitUnit}`);
+      } else {
+        showToast("Suara terisi di stok barang — periksa & simpan");
+      }
+    }
+
+    function applySpokenTranscript(transcript) {
+      if (state.voiceTarget === "catalog") {
+        applySpokenTranscriptToCatalog(transcript);
+        return;
+      }
+
+      const cleanTranscript = String(transcript || "").trim();
+      if (!cleanTranscript) return;
+
+      els.voiceStatusBar.classList.remove("hidden");
+      els.voiceStatusBar.textContent = `Ter dengar: "${cleanTranscript}"`;
+
+      let words = cleanTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+      const startsWithTambah = words.length > 0 && words[0].replace(/[^a-z]/g, "") === "tambah";
+      if (startsWithTambah) {
+        words = words.slice(1);
+      }
+
+      if (words.length === 0) {
+        showToast("Ucapkan nama barang setelah 'tambah'");
+        return;
+      }
+
+      if (els.trxType.value === "expense") {
+        const parsedAmt = parseIndonesianRupiah(words.join(" "));
+        if (parsedAmt > 0) {
+          els.trxAmount.value = parsedAmt;
+        }
+        if (!els.trxNote.value.trim()) {
+          els.trxNote.value = words.join(" ");
+        }
+        updateAmountCalculation();
+        showToast("Suara diterapkan ke pengeluaran");
+        return;
+      }
+
+      const extracted = extractItemDetailsFromWords(words);
+      const explicitUnit = extracted.unit || "";
+      const targetUnit = explicitUnit || els.itemUnit.value;
+
+      if (explicitUnit) {
+        els.itemUnit.value = explicitUnit;
+      }
+
+      const matchedCatalog = findMatchingStoreItem(extracted.rawName, targetUnit, Boolean(explicitUnit));
+      const finalName = matchedCatalog ? matchedCatalog.name : extracted.rawName;
+
+      if (finalName) {
+        els.itemName.value = finalName;
+      }
+
+      if (extracted.qty !== null && extracted.qty > 0) {
+        els.itemQty.value = extracted.qty;
+      }
+
+      autofillPriceFromStore();
+      updateAmountCalculation();
+
+      if (startsWithTambah) {
+        const resolvedUnit = targetUnit;
+        const resolvedQty = extracted.qty !== null && extracted.qty > 0 ? extracted.qty : Number(els.itemQty.value || 1);
+        const resolvedPrice = Number(els.unitPrice.value || 0);
+
+        if (finalName && resolvedQty > 0 && resolvedPrice > 0) {
+          addCurrentItemToBasket(finalName, resolvedUnit, resolvedQty, resolvedPrice);
+          els.voiceStatusBar.textContent = `Ditambahkan: ${finalName} (${resolvedQty} ${resolvedUnit})`;
+        } else {
+          els.unitPrice.focus();
+          showToast("Barang terisi — masukkan harga satuan untuk menambah");
+        }
+        return;
+      }
+
+      if (matchedCatalog) {
+        showToast(`Cocok dengan catatan ${matchedCatalog.name} (${matchedCatalog.unit})`);
+      } else {
+        showToast("Data suara terisi — periksa & simpan");
+      }
+    }
+
+    function setVoiceListeningUI(listening, statusMessage = "", target = state.voiceTarget) {
+      state.isListeningVoice = listening;
+      const isCatalog = target === "catalog";
+
+      els.voiceInputBtn.classList.toggle("listening", listening && !isCatalog);
+      els.voiceInputBtn.textContent = listening && !isCatalog ? "Stop Suara" : "Suara";
+
+      els.catalogVoiceBtn.classList.toggle("listening", listening && isCatalog);
+      els.catalogVoiceBtn.textContent = listening && isCatalog ? "Stop Suara" : "Suara";
+
+      const targetBar = isCatalog ? els.catalogVoiceStatusBar : els.voiceStatusBar;
+      if (statusMessage) {
+        targetBar.classList.remove("hidden");
+        targetBar.textContent = statusMessage;
+      }
+    }
+
+    function stopVoiceRecognition() {
+      if (state.recognitionInstance && state.isListeningVoice) {
+        try {
+          state.recognitionInstance.stop();
+        } catch {
+          // Abaikan error saat menghentikan mic
+        }
+      }
+      setVoiceListeningUI(false);
+    }
+
+    function startVoiceRecognition(target = "trx") {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const targetBar = target === "catalog" ? els.catalogVoiceStatusBar : els.voiceStatusBar;
+
+      if (!SpeechRec) {
+        targetBar.classList.remove("hidden");
+        targetBar.textContent = "Browser ini belum mendukung pengenalan suara otomatis — silakan ketik manual.";
+        showToast("Fitur suara tidak didukung di browser ini");
+        return;
+      }
+
+      if (state.isListeningVoice) {
+        const wasSameTarget = state.voiceTarget === target;
+        stopVoiceRecognition();
+        if (wasSameTarget) return;
+      }
+
+      state.voiceTarget = target;
+
+      try {
+        const rec = new SpeechRec();
+        rec.lang = "id-ID";
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+
+        rec.onstart = () => {
+          const promptMsg =
+            target === "catalog"
+              ? "Mendengarkan... sebutkan nama, sachet/renteng & harga (contoh: kopi kapal api 1 sachet harga 2000)"
+              : "Mendengarkan... ucapkan 'tambah [nama barang] [qty] [sachet/renteng]'";
+          setVoiceListeningUI(true, promptMsg, target);
+        };
+
+        rec.onresult = (event) => {
+          const transcript = event.results?.[0]?.[0]?.transcript || "";
+          applySpokenTranscript(transcript);
+        };
+
+        rec.onerror = (event) => {
+          const errCode = event?.error || "error";
+          const msg =
+            errCode === "not-allowed"
+              ? "Akses mikrofon ditolak — izinkan mikrofon di pengaturan browser."
+              : "Suara belum tertangkap — coba bicara lebih dekat atau ulangi.";
+          setVoiceListeningUI(false, msg, target);
+        };
+
+        rec.onend = () => {
+          setVoiceListeningUI(false, "", target);
+        };
+
+        state.recognitionInstance = rec;
+        rec.start();
+      } catch {
+        setVoiceListeningUI(false, "Gagal memulai mikrofon — periksa izin mikrofon browser.", target);
+      }
     }
 
     function loadAccounts() {
@@ -1692,42 +2248,65 @@
     });
 
     els.logoutBtn.addEventListener("click", async () => {
+      stopVoiceRecognition();
       await stopScanner();
       clearSession();
       enterLoginView("login");
       showToast("Anda telah keluar");
     });
 
-    function upsertStoreItem({ name, unit, price, barcode = "" }) {
-      const cleanName = String(name || "").trim();
+    function upsertStoreItem({ name, qty = null, unit, price, barcode = "" }) {
+      const rawName = String(name || "").trim();
       const cleanUnit = String(unit || "sachet").trim();
       const cleanPrice = Number(price || 0);
       const cleanBarcode = String(barcode || "").trim();
 
-      if (!cleanName || cleanPrice <= 0) return null;
+      if (!rawName || cleanPrice <= 0) return null;
 
-      const existingIdx = state.storeItems.findIndex((item) => {
-        if (cleanBarcode && item.barcode && item.barcode === cleanBarcode) return true;
-        return (
-          item.name.toLowerCase() === cleanName.toLowerCase() &&
-          item.unit.toLowerCase() === cleanUnit.toLowerCase()
+      let existingIdx = -1;
+      const sameUnitExactIdx = state.storeItems.findIndex(
+        (item) =>
+          normalizePhrase(item.name) === normalizePhrase(rawName) &&
+          normalizePhrase(item.unit) === normalizePhrase(cleanUnit)
+      );
+
+      if (sameUnitExactIdx >= 0) {
+        existingIdx = sameUnitExactIdx;
+      } else if (cleanBarcode) {
+        existingIdx = state.storeItems.findIndex(
+          (item) =>
+            item.barcode &&
+            item.barcode === cleanBarcode &&
+            normalizePhrase(item.unit) === normalizePhrase(cleanUnit)
         );
-      });
+      }
+
+      if (existingIdx < 0) {
+        const matchedSameUnit = findMatchingStoreItem(rawName, cleanUnit, true);
+        if (matchedSameUnit) {
+          existingIdx = state.storeItems.findIndex((item) => item.id === matchedSameUnit.id);
+        }
+      }
 
       let savedObj;
       if (existingIdx >= 0) {
+        const earlierItem = state.storeItems[existingIdx];
+        const prevQty = Number(earlierItem.qty ?? 1);
+        const nextQty = qty !== null && Number(qty) > 0 ? Number(qty) : prevQty;
         savedObj = {
-          ...state.storeItems[existingIdx],
-          name: cleanName,
-          unit: cleanUnit,
+          ...earlierItem,
+          name: earlierItem.name,
+          qty: nextQty,
+          unit: earlierItem.unit,
           price: cleanPrice,
-          barcode: cleanBarcode || state.storeItems[existingIdx].barcode || ""
+          barcode: cleanBarcode || earlierItem.barcode || ""
         };
         state.storeItems[existingIdx] = savedObj;
       } else {
         savedObj = {
           id: "item_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-          name: cleanName,
+          name: rawName,
+          qty: qty !== null && Number(qty) > 0 ? Number(qty) : 1,
           unit: cleanUnit,
           price: cleanPrice,
           barcode: cleanBarcode
@@ -1742,22 +2321,31 @@
 
     els.addCatalogForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      stopVoiceRecognition();
       const name = els.newCatalogName.value.trim();
+      const qty = Number(els.newCatalogQty.value || 1);
       const unit = els.newCatalogUnit.value;
       const price = Number(els.newCatalogPrice.value || 0);
       const barcode = els.newCatalogBarcode.value.trim();
 
-      if (!name || price <= 0) {
-        showToast("Isi nama barang dan harga satuan");
+      if (!name || qty <= 0 || price <= 0) {
+        showToast("Isi nama barang, qty, dan harga satuan");
         return;
       }
 
-      const savedItem = upsertStoreItem({ name, unit, price, barcode });
+      const matchedSameUnit = findMatchingStoreItem(name, unit, true);
+      const savedItem = upsertStoreItem({ name, qty, unit, price, barcode });
       els.newCatalogName.value = "";
+      els.newCatalogQty.value = "1";
       els.newCatalogPrice.value = "";
       els.newCatalogBarcode.value = "";
+      els.catalogVoiceStatusBar.classList.add("hidden");
       els.newCatalogName.focus();
-      showToast("Barang tersimpan ke daftar");
+      showToast(
+        matchedSameUnit
+          ? `Diperbarui pada ${matchedSameUnit.name} (${unit})`
+          : `Tersimpan: ${name} (${unit})`
+      );
 
       if (savedItem && String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
         try {
@@ -1776,29 +2364,28 @@
 
     function lookupSavedPrice({ name = "", unit = "", barcode = "" }) {
       const cleanCode = String(barcode || "").trim();
-      const cleanName = String(name || "").trim().toLowerCase();
-      const cleanUnit = String(unit || "").trim().toLowerCase();
+      const cleanUnit = String(unit || "").trim();
+
+      if (cleanCode) {
+        const byCodeAndUnit = state.storeItems.find(
+          (item) =>
+            item.barcode === cleanCode &&
+            normalizePhrase(item.unit) === normalizePhrase(cleanUnit) &&
+            Number(item.price) > 0
+        );
+        if (byCodeAndUnit) return byCodeAndUnit;
+      }
+
+      const matchedSameUnit = findMatchingStoreItem(name, cleanUnit, true);
+      if (matchedSameUnit && Number(matchedSameUnit.price) > 0) {
+        return matchedSameUnit;
+      }
 
       if (cleanCode) {
         const byCode = state.storeItems.find(
           (item) => item.barcode === cleanCode && Number(item.price) > 0
         );
         if (byCode) return byCode;
-      }
-
-      if (cleanName) {
-        const exactMatch = state.storeItems.find(
-          (item) =>
-            item.name.toLowerCase() === cleanName &&
-            (!cleanUnit || item.unit.toLowerCase() === cleanUnit) &&
-            Number(item.price) > 0
-        );
-        if (exactMatch) return exactMatch;
-
-        const anyUnitMatch = state.storeItems.find(
-          (item) => item.name.toLowerCase() === cleanName && Number(item.price) > 0
-        );
-        if (anyUnitMatch) return anyUnitMatch;
       }
 
       return null;
@@ -1811,9 +2398,14 @@
         unit: els.itemUnit.value,
         barcode: els.scannedBarcode.value
       });
-      if (found && Number(found.price) > 0) {
-        els.unitPrice.value = found.price;
-        updateAmountCalculation();
+      if (found) {
+        if (found.name && els.itemName.value.trim() && normalizePhrase(els.itemName.value) !== normalizePhrase(found.name)) {
+          els.itemName.value = found.name;
+        }
+        if (Number(found.price) > 0) {
+          els.unitPrice.value = found.price;
+          updateAmountCalculation();
+        }
       }
     }
 
@@ -1846,11 +2438,12 @@
         updateAmountCalculation();
         showToast(`Barcode ${code}: ${knownSaved.name}`);
       } else if (knownDefault) {
-        els.itemName.value = knownDefault.name;
+        const matchedEarlier = findMatchingStoreItem(knownDefault.name, knownDefault.unit, true);
+        els.itemName.value = matchedEarlier ? matchedEarlier.name : knownDefault.name;
         if (knownDefault.unit) els.itemUnit.value = knownDefault.unit;
         autofillPriceFromStore();
         updateAmountCalculation();
-        showToast(`Barcode ${code}: ${knownDefault.name}`);
+        showToast(`Barcode ${code}: ${els.itemName.value}`);
       } else {
         if (!els.itemName.value.trim()) {
           els.itemName.focus();
@@ -1874,6 +2467,7 @@
     }
 
     async function startScanner() {
+      stopVoiceRecognition();
       els.scannerBox.classList.remove("hidden");
       els.qrReader.classList.add("hidden");
 
@@ -1917,6 +2511,7 @@
 
     async function switchMenu(menuId) {
       if (!els.menus[menuId]) return;
+      stopVoiceRecognition();
       if (menuId !== "menu-form") {
         await stopScanner();
       }
@@ -2059,6 +2654,7 @@
     }
 
     async function resetForm(defaultType = "income") {
+      stopVoiceRecognition();
       await stopScanner();
       state.basket = [];
       els.editId.value = "";
@@ -2070,6 +2666,7 @@
       els.unitPrice.value = "";
       els.trxAmount.value = "";
       els.trxNote.value = "";
+      els.voiceStatusBar.classList.add("hidden");
       setBarcodeBadge("");
       hideSuggestions();
       populateCategories(defaultType, "Cash");
@@ -2142,12 +2739,14 @@
           const codeSub = item.barcode
             ? `<div class="brand-sub">#${escapeHtml(item.barcode)}</div>`
             : "";
+          const qtyVal = item.qty ?? 1;
           return `
             <tr>
               <td>
                 <strong>${escapeHtml(item.name)}</strong>
                 ${codeSub}
               </td>
+              <td><strong>${escapeHtml(qtyVal)}</strong></td>
               <td>${escapeHtml(item.unit)}</td>
               <td><strong class="income-text">${formatRupiah(item.price)}</strong></td>
               <td>
@@ -2175,12 +2774,12 @@
     };
 
     window.deleteStoreItem = async function (id) {
-      const ok = confirm("Hapus barang ini dari daftar?");
+      const ok = confirm("Hapus barang ini dari stok?");
       if (!ok) return;
       state.storeItems = state.storeItems.filter((i) => i.id !== id);
       saveStoreItems();
       renderCatalogTable();
-      showToast("Barang dihapus");
+      showToast("Stok barang dihapus");
       try {
         const res = await callSheetApi({
           action: "deleteItem",
@@ -2446,6 +3045,7 @@
       const target = state.transactions.find((t) => t.id === id);
       if (!target) return;
 
+      stopVoiceRecognition();
       await stopScanner();
       state.basket = [];
       els.editId.value = target.id;
@@ -2502,35 +3102,7 @@
     };
 
     els.addItemPlusBtn.addEventListener("click", () => {
-      const name = els.itemName.value.trim();
-      const unit = els.itemUnit.value;
-      const qty = Number(els.itemQty.value || 0);
-      const unitPrice = Number(els.unitPrice.value || 0);
-      const barcode = els.scannedBarcode.value.trim();
-
-      if (!name) {
-        showToast("Isi nama barang dulu");
-        els.itemName.focus();
-        return;
-      }
-      if (qty <= 0 || unitPrice <= 0) {
-        showToast("Isi qty dan harga satuan dulu");
-        return;
-      }
-
-      const total = Math.round(qty * unitPrice);
-      state.basket.push({ name, unit, qty, unitPrice, barcode, total });
-      upsertStoreItem({ name, unit, price: unitPrice, barcode });
-
-      els.itemName.value = "";
-      els.itemQty.value = "1";
-      els.unitPrice.value = "";
-      setBarcodeBadge("");
-      hideSuggestions();
-      renderBasket();
-      updateAmountCalculation();
-      els.itemName.focus();
-      showToast("Item ditambah & harga tersimpan");
+      addCurrentItemToBasket();
     });
 
     [els.printFlowType, els.printPeriodMode, els.printCalendarDate].forEach((ctrl) => {
@@ -2564,6 +3136,9 @@
       await resetForm("expense");
       await switchMenu("menu-form");
     });
+
+    els.voiceInputBtn.addEventListener("click", () => startVoiceRecognition("trx"));
+    els.catalogVoiceBtn.addEventListener("click", () => startVoiceRecognition("catalog"));
 
     els.toggleScanBtn.addEventListener("click", () => {
       if (!els.scannerBox.classList.contains("hidden")) {
@@ -2627,6 +3202,7 @@
     els.trxDate.addEventListener("change", updateFormDayLabel);
 
     els.trxType.addEventListener("change", async () => {
+      stopVoiceRecognition();
       if (els.trxType.value !== "income") {
         await stopScanner();
         setBarcodeBadge("");
@@ -2648,6 +3224,7 @@
 
     els.trxForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      stopVoiceRecognition();
 
       const type = els.trxType.value;
       const date = els.trxDate.value || getTodayISO();
@@ -2665,8 +3242,10 @@
       if (type === "income") {
         itemsToSave = state.basket.map((x) => ({ ...x }));
 
-        const currentName = els.itemName.value.trim();
+        const rawCurrentName = els.itemName.value.trim();
         const currentUnit = els.itemUnit.value;
+        const matchedExisting = findMatchingStoreItem(rawCurrentName, currentUnit, true);
+        const currentName = matchedExisting ? matchedExisting.name : rawCurrentName;
         const currentQty = Number(els.itemQty.value || 0);
         const currentPrice = Number(els.unitPrice.value || 0);
         const currentBarcode = els.scannedBarcode.value.trim();
@@ -2691,6 +3270,11 @@
         }
 
         itemsToSave.forEach((row) => {
+          const matchedRow = findMatchingStoreItem(row.name, row.unit, true);
+          if (matchedRow) {
+            row.name = matchedRow.name;
+            row.total = Math.round(Number(row.qty || 1) * Number(row.unitPrice || 0));
+          }
           const saved = upsertStoreItem({
             name: row.name,
             unit: row.unit,
