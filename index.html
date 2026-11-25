@@ -102,6 +102,17 @@
       color: #ffffff;
     }
 
+    .link-btn {
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
     .top-nav {
       position: sticky;
       top: 8px;
@@ -110,8 +121,8 @@
       border-radius: 999px;
       padding: 6px;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
       margin-bottom: 12px;
       z-index: 50;
@@ -121,9 +132,9 @@
       border: none;
       background: transparent;
       color: #cbd5e1;
-      padding: 8px 4px;
+      padding: 8px 3px;
       border-radius: 999px;
-      font-size: 0.74rem;
+      font-size: 0.7rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.15s ease, color 0.15s ease;
@@ -519,32 +530,6 @@
       font-weight: 800;
     }
 
-    .print-row {
-      margin-bottom: 8px;
-    }
-
-    .print-row .btn-sm {
-      width: 100%;
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-
-    .history-toolbar {
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .print-group {
-      display: inline-flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
     .form-footer {
       display: flex;
       gap: 8px;
@@ -554,13 +539,6 @@
 
     .form-footer .btn {
       flex: 1;
-    }
-
-    .filter-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
     }
 
     .table-wrap {
@@ -574,7 +552,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.76rem;
-      min-width: 420px;
+      min-width: 380px;
     }
 
     th, td {
@@ -615,6 +593,11 @@
     .badge-income {
       background: var(--income-soft);
       color: var(--income);
+    }
+
+    .badge-expense {
+      background: var(--expense-soft);
+      color: var(--expense);
     }
 
     .row-actions {
@@ -728,12 +711,12 @@
   <div class="toast" id="toast"></div>
   <div id="printReportArea"></div>
 
-  <!-- GERBANG DAFTAR & LOGIN -->
+  <!-- GERBANG DAFTAR, LOGIN & LUPA KATA SANDI -->
   <section class="login-card" id="loginGate">
     <div class="login-title" id="authHeading">Daftar Akun Toko</div>
     <div class="login-sub" id="authSub">Daftarkan Gmail, kata sandi, dan nama toko terlebih dahulu sebelum login.</div>
 
-    <div class="auth-tabs" role="tablist">
+    <div class="auth-tabs" id="authTabs" role="tablist">
       <button type="button" class="auth-tab-btn active" id="tabRegisterBtn" data-mode="register">Daftar</button>
       <button type="button" class="auth-tab-btn" id="tabLoginBtn" data-mode="login">Login</button>
     </div>
@@ -799,10 +782,52 @@
         />
       </div>
 
-      <div style="margin-top: 10px;">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
+        <button type="button" class="link-btn" id="openForgotBtn">Lupa Kata Sandi?</button>
+      </div>
+
+      <div>
         <button type="submit" class="btn btn-dark" style="width: 100%;" id="loginSubmitBtn">
           Masuk ke Toko
         </button>
+      </div>
+    </form>
+
+    <!-- FORM LUPA KATA SANDI -->
+    <form id="forgotForm" class="hidden" autocomplete="off">
+      <div class="form-group">
+        <label for="forgotGmail">Email Gmail Terdaftar</label>
+        <input
+          type="email"
+          id="forgotGmail"
+          placeholder="namatoko@gmail.com"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="forgotStoreName">Nama Toko Terdaftar</label>
+        <input
+          type="text"
+          id="forgotStoreName"
+          placeholder="Contoh: Warung Berkah"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="forgotNewPassword">Kata Sandi Baru</label>
+        <input
+          type="password"
+          id="forgotNewPassword"
+          placeholder="Masukkan kata sandi baru"
+          required
+        />
+      </div>
+
+      <div class="form-footer">
+        <button type="button" class="btn-sm" id="backToLoginBtn">Kembali Login</button>
+        <button type="submit" class="btn btn-dark" id="resetPassSubmitBtn">Reset Kata Sandi</button>
       </div>
     </form>
   </section>
@@ -815,6 +840,7 @@
       <button type="button" class="nav-btn" data-menu="menu-form">Catatan Kas</button>
       <button type="button" class="nav-btn" data-menu="menu-catalog">Barang</button>
       <button type="button" class="nav-btn" data-menu="menu-history">Riwayat</button>
+      <button type="button" class="nav-btn" data-menu="menu-print">Print</button>
     </nav>
 
     <!-- MENU 1: RINGKASAN -->
@@ -970,10 +996,6 @@
           <span class="amt" id="finalAmountPreview">Rp0</span>
         </div>
 
-        <div class="print-row">
-          <button type="button" class="btn-sm" id="printTrxBtn">Print</button>
-        </div>
-
         <div class="sub-card sub-card-extra">
           <div class="form-grid">
             <div class="form-group">
@@ -1065,37 +1087,14 @@
     <!-- MENU 4: RIWAYAT -->
     <section class="card hidden" id="menu-history">
       <div class="section-title">
-        <span>Riwayat Pemasukan</span>
+        <span>Riwayat Hari Ini (Mulai 00:00)</span>
         <span id="totalFilteredLabel" class="brand-sub">0 data</span>
-      </div>
-
-      <div class="date-badge-line" id="historyFilterDayDisplay">Semua Tanggal</div>
-
-      <div class="filter-grid">
-        <div class="form-group">
-          <label for="filterDate">Filter Tanggal</label>
-          <input type="date" id="filterDate" />
-        </div>
-
-        <div class="form-group">
-          <label for="filterSearch">Cari Barang / Barcode / Catatan</label>
-          <input type="text" id="filterSearch" placeholder="Ketik kata kunci atau barcode..." />
-        </div>
-      </div>
-
-      <div class="history-toolbar">
-        <button type="button" class="btn-sm" id="resetFiltersBtn">Reset Filter</button>
-        <div class="print-group">
-          <button type="button" class="btn-sm" id="printDayBtn">Print Hari</button>
-          <button type="button" class="btn-sm" id="printMonthBtn">Print Bulan</button>
-        </div>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Hari & Tanggal</th>
               <th>Jenis</th>
               <th>Rincian</th>
               <th>Jumlah</th>
@@ -1105,7 +1104,46 @@
           <tbody id="trxTableBody"></tbody>
         </table>
       </div>
-      <div class="empty-box hidden" id="emptyState">Belum ada pemasukan yang tercatat.</div>
+      <div class="empty-box hidden" id="emptyState">Belum ada transaksi tercatat sejak pukul 00:00 hari ini.</div>
+    </section>
+
+    <!-- MENU 5: PRINT DATA -->
+    <section class="card hidden" id="menu-print">
+      <div class="section-title">
+        <span>Print Data Kas</span>
+      </div>
+
+      <div class="sub-card sub-card-meta">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="printFlowType">Jenis Data</label>
+            <select id="printFlowType">
+              <option value="income">Pemasukan</option>
+              <option value="expense">Pengeluaran</option>
+              <option value="both">Pemasukan & Pengeluaran</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="printPeriodMode">Periode</label>
+            <select id="printPeriodMode">
+              <option value="day">Hari</option>
+              <option value="month">Bulan</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <label for="printCalendarDate">Pilih Tanggal (Kalender)</label>
+          <input type="date" id="printCalendarDate" />
+        </div>
+
+        <div class="brand-sub" id="printSelectionSummary" style="margin-top:6px;">-</div>
+      </div>
+
+      <button type="button" class="btn btn-dark" style="width:100%;" id="executePrintBtn">
+        Print Sekarang
+      </button>
     </section>
   </div>
 
@@ -1114,8 +1152,8 @@
 
     const ACCOUNTS_KEY = "catat_warung_accounts_v1";
     const SESSION_KEY = "catat_warung_active_session_v1";
-    const STORAGE_KEY = "catat_warung_eceran_v15";
-    const CATALOG_KEY = "catat_warung_toko_catalog_v10";
+    const STORAGE_KEY = "catat_warung_eceran_v16";
+    const CATALOG_KEY = "catat_warung_toko_catalog_v11";
 
     const HARI_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
     const BULAN_ID = [
@@ -1153,6 +1191,7 @@
       loginGate: document.getElementById("loginGate"),
       authHeading: document.getElementById("authHeading"),
       authSub: document.getElementById("authSub"),
+      authTabs: document.getElementById("authTabs"),
       tabRegisterBtn: document.getElementById("tabRegisterBtn"),
       tabLoginBtn: document.getElementById("tabLoginBtn"),
       registerForm: document.getElementById("registerForm"),
@@ -1164,18 +1203,25 @@
       loginGmail: document.getElementById("loginGmail"),
       loginPassword: document.getElementById("loginPassword"),
       loginSubmitBtn: document.getElementById("loginSubmitBtn"),
+      openForgotBtn: document.getElementById("openForgotBtn"),
+      forgotForm: document.getElementById("forgotForm"),
+      forgotGmail: document.getElementById("forgotGmail"),
+      forgotStoreName: document.getElementById("forgotStoreName"),
+      forgotNewPassword: document.getElementById("forgotNewPassword"),
+      backToLoginBtn: document.getElementById("backToLoginBtn"),
+      resetPassSubmitBtn: document.getElementById("resetPassSubmitBtn"),
       mainApp: document.getElementById("mainApp"),
       topNav: document.getElementById("topNav"),
       activeStoreLabel: document.getElementById("activeStoreLabel"),
       logoutBtn: document.getElementById("logoutBtn"),
       summaryDateDisplay: document.getElementById("summaryDateDisplay"),
       formDayDisplay: document.getElementById("formDayDisplay"),
-      historyFilterDayDisplay: document.getElementById("historyFilterDayDisplay"),
       menus: {
         "menu-summary": document.getElementById("menu-summary"),
         "menu-form": document.getElementById("menu-form"),
         "menu-catalog": document.getElementById("menu-catalog"),
-        "menu-history": document.getElementById("menu-history")
+        "menu-history": document.getElementById("menu-history"),
+        "menu-print": document.getElementById("menu-print")
       },
       navBtns: document.querySelectorAll(".nav-btn"),
       periodBtns: document.querySelectorAll(".period-btn"),
@@ -1216,7 +1262,6 @@
       trxCategory: document.getElementById("trxCategory"),
       trxNote: document.getElementById("trxNote"),
       finalAmountPreview: document.getElementById("finalAmountPreview"),
-      printTrxBtn: document.getElementById("printTrxBtn"),
       submitTrxBtn: document.getElementById("submitTrxBtn"),
 
       catalogCountLabel: document.getElementById("catalogCountLabel"),
@@ -1228,14 +1273,15 @@
       catalogTableBody: document.getElementById("catalogTableBody"),
       catalogEmptyState: document.getElementById("catalogEmptyState"),
 
-      filterDate: document.getElementById("filterDate"),
-      filterSearch: document.getElementById("filterSearch"),
-      resetFiltersBtn: document.getElementById("resetFiltersBtn"),
-      printDayBtn: document.getElementById("printDayBtn"),
-      printMonthBtn: document.getElementById("printMonthBtn"),
       totalFilteredLabel: document.getElementById("totalFilteredLabel"),
       trxTableBody: document.getElementById("trxTableBody"),
-      emptyState: document.getElementById("emptyState")
+      emptyState: document.getElementById("emptyState"),
+
+      printFlowType: document.getElementById("printFlowType"),
+      printPeriodMode: document.getElementById("printPeriodMode"),
+      printCalendarDate: document.getElementById("printCalendarDate"),
+      printSelectionSummary: document.getElementById("printSelectionSummary"),
+      executePrintBtn: document.getElementById("executePrintBtn")
     };
 
     function parseISODate(isoStr) {
@@ -1410,6 +1456,9 @@
     }
 
     function setAuthTab(mode) {
+      els.authTabs.classList.remove("hidden");
+      els.forgotForm.classList.add("hidden");
+
       const isRegister = mode === "register";
       els.tabRegisterBtn.classList.toggle("active", isRegister);
       els.tabLoginBtn.classList.toggle("active", !isRegister);
@@ -1418,10 +1467,24 @@
 
       if (isRegister) {
         els.authHeading.textContent = "Daftar Akun Toko";
-        els.authSub.textContent = "Masukkan Gmail, kata sandi, dan nama toko sebelum login.";
+        els.authSub.textContent = "Daftarkan Gmail, kata sandi, dan nama toko terlebih dahulu sebelum login.";
       } else {
         els.authHeading.textContent = "Login Pemilik Toko";
         els.authSub.textContent = "Masuk memakai Gmail dan kata sandi yang sudah didaftarkan.";
+      }
+    }
+
+    function openForgotPasswordView() {
+      els.authTabs.classList.add("hidden");
+      els.registerForm.classList.add("hidden");
+      els.loginForm.classList.add("hidden");
+      els.forgotForm.classList.remove("hidden");
+
+      els.authHeading.textContent = "Lupa Kata Sandi";
+      els.authSub.textContent = "Verifikasi Gmail dan nama toko terdaftar untuk membuat kata sandi baru.";
+
+      if (els.loginGmail.value.trim()) {
+        els.forgotGmail.value = els.loginGmail.value.trim().toLowerCase();
       }
     }
 
@@ -1450,6 +1513,58 @@
 
     els.tabRegisterBtn.addEventListener("click", () => setAuthTab("register"));
     els.tabLoginBtn.addEventListener("click", () => setAuthTab("login"));
+    els.openForgotBtn.addEventListener("click", openForgotPasswordView);
+    els.backToLoginBtn.addEventListener("click", () => setAuthTab("login"));
+
+    els.forgotForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const gmail = els.forgotGmail.value.trim().toLowerCase();
+      const storeName = els.forgotStoreName.value.trim();
+      const newPassword = els.forgotNewPassword.value;
+
+      if (!gmail || !storeName || !newPassword) {
+        showToast("Lengkapi Gmail, nama toko, dan kata sandi baru");
+        return;
+      }
+
+      const accIdx = state.accounts.findIndex(
+        (acc) =>
+          String(acc.gmail || "").toLowerCase() === gmail &&
+          String(acc.storeName || "").trim().toLowerCase() === storeName.toLowerCase()
+      );
+
+      if (accIdx < 0) {
+        showToast("Gmail atau nama toko tidak cocok dengan akun terdaftar");
+        return;
+      }
+
+      state.accounts[accIdx] = {
+        ...state.accounts[accIdx],
+        password: newPassword,
+        updatedAt: new Date().toISOString()
+      };
+      saveAccounts();
+
+      if (String(DEFAULT_SHEET_WEBAPP_URL || "").trim()) {
+        try {
+          await callSheetApi({
+            action: "register",
+            storeId: gmail,
+            gmail,
+            pin: newPassword,
+            storeName: state.accounts[accIdx].storeName
+          });
+        } catch {
+          // Tetap tersimpan lokal
+        }
+      }
+
+      els.forgotNewPassword.value = "";
+      els.loginGmail.value = gmail;
+      els.loginPassword.value = "";
+      setAuthTab("login");
+      showToast("Kata sandi berhasil diperbarui — silakan login");
+    });
 
     els.registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1528,7 +1643,7 @@
       }
 
       if (foundAccount.password !== password) {
-        showToast("Kata sandi salah");
+        showToast("Kata sandi salah — klik Lupa Kata Sandi jika lupa");
         return;
       }
 
@@ -1561,6 +1676,10 @@
 
         enterAppView();
         await resetForm("income");
+        if (!els.printCalendarDate.value) {
+          els.printCalendarDate.value = getTodayISO();
+        }
+        updatePrintSelectionSummary();
         renderCatalogTable();
         await switchMenu("menu-summary");
         renderSummary();
@@ -1815,6 +1934,15 @@
       els.navBtns.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.menu === menuId);
       });
+
+      if (menuId === "menu-history") {
+        renderTable();
+      } else if (menuId === "menu-print") {
+        if (!els.printCalendarDate.value) {
+          els.printCalendarDate.value = getTodayISO();
+        }
+        updatePrintSelectionSummary();
+      }
 
       hideSuggestions();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2125,7 +2253,7 @@
         }];
       }
       return [{
-        name: item.category || "Pemasukan",
+        name: item.category || (item.type === "expense" ? "Pengeluaran" : "Pemasukan"),
         qty: 1,
         unit: "trx",
         unitPrice: Number(item.amount || 0),
@@ -2134,35 +2262,16 @@
       }];
     }
 
-    function getFilteredIncomeTransactions() {
-      const dateVal = els.filterDate.value;
-      const q = els.filterSearch.value.trim().toLowerCase();
-
+    function getTodayMidnightHistoryTransactions() {
+      const todayISO = getTodayISO();
       return state.transactions
-        .filter((item) => {
-          if (item.type !== "income") return false;
-          const okDate = !dateVal || item.date === dateVal;
-          const lines = getTransactionLineItems(item);
-          const itemsText = lines.map((x) => `${x.name} ${x.barcode || ""}`).join(" ");
-          const hay = `${item.itemName || ""} ${itemsText} ${item.barcode || ""} ${item.category || ""} ${item.note || ""}`.toLowerCase();
-          const okSearch = !q || hay.includes(q);
-          return okDate && okSearch;
-        })
-        .sort((a, b) => {
-          const dCmp = String(b.date).localeCompare(String(a.date));
-          if (dCmp !== 0) return dCmp;
-          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
-        });
+        .filter((item) => item.date === todayISO)
+        .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
     }
 
     function renderTable() {
-      const dateVal = els.filterDate.value;
-      els.historyFilterDayDisplay.textContent = dateVal
-        ? `Filter: ${formatDayAndDDMMYY(dateVal)}`
-        : `Semua Tanggal • Hari Ini: ${formatDayAndDDMMYY(getTodayISO())}`;
-
-      const items = getFilteredIncomeTransactions();
-      els.totalFilteredLabel.textContent = `${items.length} transaksi`;
+      const items = getTodayMidnightHistoryTransactions();
+      els.totalFilteredLabel.textContent = `${items.length} data`;
 
       if (items.length === 0) {
         els.trxTableBody.innerHTML = "";
@@ -2173,6 +2282,12 @@
       els.emptyState.classList.add("hidden");
       els.trxTableBody.innerHTML = items
         .map((item) => {
+          const isExpense = item.type === "expense";
+          const badgeClass = isExpense ? "badge-expense" : "badge-income";
+          const badgeText = isExpense ? "Keluar" : "Masuk";
+          const amtClass = isExpense ? "expense-text" : "income-text";
+          const prefixSign = isExpense ? "-" : "+";
+
           const lines = getTransactionLineItems(item);
           const metaParts = [];
           if (item.category) metaParts.push(escapeHtml(item.category));
@@ -2181,28 +2296,23 @@
             ? `<div class="brand-sub" style="margin-top:2px;">${metaParts.join(" • ")}</div>`
             : "";
 
-          const rincianHtml = lines
-            .map((x) => {
-              const codeNote = x.barcode ? ` (#${escapeHtml(x.barcode)})` : "";
-              return `<div class="rincian-line">• <strong>${escapeHtml(x.name)}</strong>${codeNote} — ${escapeHtml(x.qty)} ${escapeHtml(x.unit)} × ${formatRupiah(x.unitPrice)} = <strong>${formatRupiah(x.total)}</strong></div>`;
-            })
-            .join("");
-
-          const dayLabel = escapeHtml(getDayName(item.date));
-          const dateLabel = escapeHtml(formatDDMMYY(item.date));
+          const rincianHtml = isExpense
+            ? `<div class="rincian-line"><strong>${escapeHtml(item.category || "Pengeluaran")}</strong>${item.note ? " • " + escapeHtml(item.note) : ""}</div>`
+            : lines
+                .map((x) => {
+                  const codeNote = x.barcode ? ` (#${escapeHtml(x.barcode)})` : "";
+                  return `<div class="rincian-line">• <strong>${escapeHtml(x.name)}</strong>${codeNote} — ${escapeHtml(x.qty)} ${escapeHtml(x.unit)} × ${formatRupiah(x.unitPrice)} = <strong>${formatRupiah(x.total)}</strong></div>`;
+                })
+                .join("");
 
           return `
             <tr>
-              <td>
-                <div><strong>${dayLabel}</strong></div>
-                <div class="brand-sub">${dateLabel}</div>
-              </td>
-              <td><span class="badge badge-income">Masuk</span></td>
+              <td><span class="badge ${badgeClass}">${badgeText}</span></td>
               <td>
                 ${rincianHtml}
                 ${metaHtml}
               </td>
-              <td class="income-text"><strong>+${formatRupiah(item.amount)}</strong></td>
+              <td class="${amtClass}"><strong>${prefixSign}${formatRupiah(item.amount)}</strong></td>
               <td>
                 <div class="row-actions">
                   <button type="button" class="icon-btn" onclick="startEdit('${escapeHtml(item.id)}')">Edit</button>
@@ -2215,63 +2325,100 @@
         .join("");
     }
 
-    function printHistoryPeriod(mode) {
-      const refDate = els.filterDate.value || getTodayISO();
-      const monthPrefix = refDate.slice(0, 7);
-      const q = els.filterSearch.value.trim().toLowerCase();
+    function updatePrintSelectionSummary() {
+      const flow = els.printFlowType.value;
+      const mode = els.printPeriodMode.value;
+      const pickedDate = els.printCalendarDate.value || getTodayISO();
 
-      const matched = state.transactions
-        .filter((item) => {
-          if (item.type !== "income") return false;
-          const matchDate =
-            mode === "day"
-              ? item.date === refDate
-              : String(item.date || "").startsWith(monthPrefix);
-          if (!matchDate) return false;
-
-          const lines = getTransactionLineItems(item);
-          const itemsText = lines.map((x) => `${x.name} ${x.barcode || ""}`).join(" ");
-          const hay = `${item.itemName || ""} ${itemsText} ${item.barcode || ""} ${item.category || ""} ${item.note || ""}`.toLowerCase();
-          return !q || hay.includes(q);
-        })
-        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      const flowLabel =
+        flow === "income"
+          ? "Pemasukan"
+          : flow === "expense"
+          ? "Pengeluaran"
+          : "Pemasukan & Pengeluaran";
 
       const periodLabel =
         mode === "day"
-          ? `Laporan Pemasukan Harian (${formatDayAndDDMMYY(refDate)})`
-          : `Laporan Pemasukan Bulanan (${getMonthNameLabel(refDate)})`;
+          ? `Hari: ${formatDayAndDDMMYY(pickedDate)}`
+          : `Bulan: ${getMonthNameLabel(pickedDate)} (${formatDDMMYY(pickedDate).slice(3)})`;
 
-      let grandTotal = 0;
+      els.printSelectionSummary.textContent = `${flowLabel} • ${periodLabel}`;
+    }
+
+    function executeCustomPrint() {
+      const flow = els.printFlowType.value;
+      const mode = els.printPeriodMode.value;
+      const refDate = els.printCalendarDate.value || getTodayISO();
+      const monthPrefix = refDate.slice(0, 7);
+
+      const flowLabel =
+        flow === "income"
+          ? "Pemasukan"
+          : flow === "expense"
+          ? "Pengeluaran"
+          : "Pemasukan & Pengeluaran";
+
+      const periodLabel =
+        mode === "day"
+          ? `Harian (${formatDayAndDDMMYY(refDate)})`
+          : `Bulanan (${getMonthNameLabel(refDate)})`;
+
+      const matched = state.transactions
+        .filter((item) => {
+          const okFlow = flow === "both" ? true : item.type === flow;
+          if (!okFlow) return false;
+          return mode === "day"
+            ? item.date === refDate
+            : String(item.date || "").startsWith(monthPrefix);
+        })
+        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+      let totalIncome = 0;
+      let totalExpense = 0;
       const rowsHtml = [];
 
       for (const trx of matched) {
-        const lines = getTransactionLineItems(trx);
-        for (const ln of lines) {
-          grandTotal += Math.round(Number(ln.total || 0));
-          rowsHtml.push(`
-            <tr>
-              <td>${escapeHtml(formatDayAndDDMMYY(trx.date))}</td>
-              <td>${escapeHtml(ln.name)}</td>
-              <td>${escapeHtml(ln.qty)} ${escapeHtml(ln.unit)}</td>
-              <td>${formatRupiah(ln.unitPrice)}</td>
-              <td>${escapeHtml(trx.category || "Cash")}${trx.note ? " • " + escapeHtml(trx.note) : ""}</td>
-              <td>${formatRupiah(ln.total)}</td>
-            </tr>
-          `);
+        const isExpense = trx.type === "expense";
+        const amt = Math.round(Number(trx.amount || 0));
+        if (isExpense) {
+          totalExpense += amt;
+        } else {
+          totalIncome += amt;
         }
+
+        const lines = getTransactionLineItems(trx);
+        const descText = isExpense
+          ? `${trx.category || "Pengeluaran"}${trx.note ? " (" + trx.note + ")" : ""}`
+          : lines
+              .map((x) => `${x.name} (${x.qty} ${x.unit} × ${formatRupiah(x.unitPrice)})`)
+              .join(", ") + (trx.note ? ` • ${trx.note}` : "");
+
+        rowsHtml.push(`
+          <tr>
+            <td>${escapeHtml(formatDayAndDDMMYY(trx.date))}</td>
+            <td>${isExpense ? "Pengeluaran" : "Pemasukan"}</td>
+            <td>${escapeHtml(descText)}</td>
+            <td>${isExpense ? "-" : "+"}${formatRupiah(amt)}</td>
+          </tr>
+        `);
       }
 
+      const netSummary =
+        flow === "income"
+          ? `Total Pemasukan: ${formatRupiah(totalIncome)}`
+          : flow === "expense"
+          ? `Total Pengeluaran: ${formatRupiah(totalExpense)}`
+          : `Pemasukan: ${formatRupiah(totalIncome)} | Pengeluaran: ${formatRupiah(totalExpense)} | Selisih: ${formatRupiah(totalIncome - totalExpense)}`;
+
       els.printReportArea.innerHTML = `
-        <div class="print-title">${escapeHtml(periodLabel)}</div>
-        <div class="print-meta">Toko: ${escapeHtml(state.session?.storeName || state.session?.gmail || "-")} • Dicetak: ${escapeHtml(formatDayAndDDMMYY(getTodayISO()))} • Total Item: ${rowsHtml.length}</div>
+        <div class="print-title">Laporan ${escapeHtml(flowLabel)} — ${escapeHtml(periodLabel)}</div>
+        <div class="print-meta">Toko: ${escapeHtml(state.session?.storeName || state.session?.gmail || "-")} • Dicetak: ${escapeHtml(formatDayAndDDMMYY(getTodayISO()))} • Jumlah Data: ${rowsHtml.length}</div>
         <table class="print-table">
           <thead>
             <tr>
               <th>Hari & Tanggal</th>
-              <th>Barang</th>
-              <th>Qty</th>
-              <th>Harga</th>
-              <th>Ket</th>
+              <th>Jenis</th>
+              <th>Rincian</th>
               <th>Jumlah</th>
             </tr>
           </thead>
@@ -2279,11 +2426,11 @@
             ${
               rowsHtml.length > 0
                 ? rowsHtml.join("")
-                : `<tr><td colspan="6" style="text-align:center;">Tidak ada data pemasukan pada periode ini.</td></tr>`
+                : `<tr><td colspan="4" style="text-align:center;">Tidak ada data pada pilihan tanggal/periode ini.</td></tr>`
             }
           </tbody>
         </table>
-        <div class="print-total">Total Pemasukan: ${formatRupiah(grandTotal)}</div>
+        <div class="print-total">${escapeHtml(netSummary)}</div>
       `;
 
       window.print();
@@ -2386,72 +2533,12 @@
       showToast("Item ditambah & harga tersimpan");
     });
 
-    els.printTrxBtn.addEventListener("click", () => {
-      const dateStr = els.trxDate.value || getTodayISO();
-      const catStr = els.trxCategory.value || "Cash";
-      const noteStr = els.trxNote.value.trim();
-
-      const lines = state.basket.map((x) => ({ ...x }));
-      const curName = els.itemName.value.trim();
-      const curUnit = els.itemUnit.value;
-      const curQty = Number(els.itemQty.value || 0);
-      const curPrice = Number(els.unitPrice.value || 0);
-      const curBarcode = els.scannedBarcode.value.trim();
-      if (curName && curQty > 0 && curPrice > 0) {
-        lines.push({
-          name: curName,
-          unit: curUnit,
-          qty: curQty,
-          unitPrice: curPrice,
-          barcode: curBarcode,
-          total: Math.round(curQty * curPrice)
-        });
-      }
-
-      const totalAmt =
-        els.trxType.value === "income"
-          ? lines.reduce((s, x) => s + Math.round(Number(x.total || 0)), 0)
-          : Math.round(Number(els.trxAmount.value || 0));
-
-      els.printReportArea.innerHTML = `
-        <div class="print-title">Struk Belanja</div>
-        <div class="print-meta">Toko: ${escapeHtml(state.session?.storeName || state.session?.gmail || "-")} • ${escapeHtml(formatDayAndDDMMYY(dateStr))} • Kategori: ${escapeHtml(catStr)}${noteStr ? " • " + escapeHtml(noteStr) : ""}</div>
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th>Barang</th>
-              <th>Qty</th>
-              <th>Harga</th>
-              <th>Jumlah</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${
-              lines.length > 0
-                ? lines
-                    .map(
-                      (x) => `
-                        <tr>
-                          <td>${escapeHtml(x.name)}</td>
-                          <td>${escapeHtml(x.qty)} ${escapeHtml(x.unit)}</td>
-                          <td>${formatRupiah(x.unitPrice)}</td>
-                          <td>${formatRupiah(x.total)}</td>
-                        </tr>
-                      `
-                    )
-                    .join("")
-                : `<tr><td colspan="4">${escapeHtml(catStr)}</td></tr>`
-            }
-          </tbody>
-        </table>
-        <div class="print-total">Total: ${formatRupiah(totalAmt)}</div>
-      `;
-
-      window.print();
+    [els.printFlowType, els.printPeriodMode, els.printCalendarDate].forEach((ctrl) => {
+      ctrl.addEventListener("change", updatePrintSelectionSummary);
+      ctrl.addEventListener("input", updatePrintSelectionSummary);
     });
 
-    els.printDayBtn.addEventListener("click", () => printHistoryPeriod("day"));
-    els.printMonthBtn.addEventListener("click", () => printHistoryPeriod("month"));
+    els.executePrintBtn.addEventListener("click", executeCustomPrint);
 
     els.navBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -2684,17 +2771,6 @@
       }
     });
 
-    [els.filterDate, els.filterSearch].forEach((input) => {
-      input.addEventListener("input", renderTable);
-      input.addEventListener("change", renderTable);
-    });
-
-    els.resetFiltersBtn.addEventListener("click", () => {
-      els.filterDate.value = "";
-      els.filterSearch.value = "";
-      renderTable();
-    });
-
     async function init() {
       if (!state.session) {
         enterLoginView();
@@ -2705,6 +2781,10 @@
       state.storeItems = loadStoreItems();
       enterAppView();
       await resetForm("income");
+      if (!els.printCalendarDate.value) {
+        els.printCalendarDate.value = getTodayISO();
+      }
+      updatePrintSelectionSummary();
       renderCatalogTable();
       await switchMenu("menu-summary");
       renderSummary();
