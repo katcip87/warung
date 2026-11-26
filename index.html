@@ -707,10 +707,6 @@
       min-width: 500px;
     }
 
-    .compact-table {
-      min-width: 100%;
-    }
-
     th, td {
       text-align: left;
       padding: 0.52rem 0.6rem;
@@ -747,12 +743,6 @@
     .badge-out {
       background-color: var(--danger-bg);
       color: var(--danger-text);
-    }
-
-    .badge-local {
-      background-color: var(--warn-bg);
-      color: var(--warn-text);
-      border: 1px solid var(--warn-border);
     }
 
     .transparansi-status {
@@ -1169,7 +1159,7 @@
             </button>
           </div>
           <div class="voice-hint-msg" id="voiceStatusMsg">
-            Contoh ucapkan: <strong>&ldquo;rokok 5 bungkus 17000&rdquo;</strong> atau <strong>&ldquo;susu 2 kaleng 12500&rdquo;</strong>.
+            Contoh ucapkan: <strong>&ldquo;kopi kapal api spesial saset lima saset&rdquo;</strong> atau <strong>&ldquo;rokok 5 bungkus 17000&rdquo;</strong>.
           </div>
         </div>
 
@@ -1274,7 +1264,7 @@
           <input type="search" class="form-control" id="riwayatSearchInput" placeholder="Cari barang transaksi hari ini..." oninput="resetRiwayatPageAndRender()">
         </div>
 
-        <div class="transparansi-status" id="statusText">Catatan aktif 24 jam (reset otomatis pukul 00:00). Semua arsip ada di menu Print.</div>
+        <div class="transparansi-status" id="statusText">Catatan aktif 24 jam (reset otomatis pukul 00:00). Semua arsip ada di menu Laporan.</div>
 
         <div class="table-wrap">
           <table>
@@ -1307,12 +1297,12 @@
     </div>
 
     <!-- =========================================================
-         MENU 5: PRINT (SEMUA TRANSAKSI SHEET: HARI, MINGGU, BULAN & STRUK)
+         MENU 5: LAPORAN (SEMUA TRANSAKSI SHEET: HARI, MINGGU, BULAN & STRUK)
     ========================================================== -->
     <div id="view-print" class="app-view">
       <div class="app-card">
         <div class="card-header no-print">
-          <h2 class="card-title">Cetak &amp; Arsip Semua Transaksi</h2>
+          <h2 class="card-title">Laporan &amp; Cetak Transaksi</h2>
         </div>
 
         <div class="segmented-control no-print">
@@ -1492,7 +1482,7 @@
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
         </svg>
-        <span>Print</span>
+        <span>Laporan</span>
       </button>
     </nav>
   </div>
@@ -1557,7 +1547,6 @@
       const storedDate = localStorage.getItem(STORAGE_KEYS.activeDate);
 
       if (storedDate !== todayISO) {
-        // Pergantian hari lewat 00:00: kosongkan histori harian lokal & struk harian
         localStorage.setItem(STORAGE_KEYS.activeDate, todayISO);
         localStorage.setItem(STORAGE_KEYS.cacheIn, "[]");
         localStorage.setItem(STORAGE_KEYS.cacheOut, "[]");
@@ -1596,16 +1585,11 @@
     }
 
     // =========================================================================
-    // SUARA TEKS (TTS) & INPUT SUARA (STT) TRANSAKSI + KATALOG
+    // SUARA AI (TTS) DINONAKTIFKAN + INPUT SUARA (STT) TRANSAKSI + KATALOG
     // =========================================================================
     function ucapkan(teks) {
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
-        const suara = new SpeechSynthesisUtterance(teks);
-        suara.lang = "id-ID";
-        suara.rate = 1.0;
-        suara.pitch = 1.0;
-        window.speechSynthesis.speak(suara);
       }
     }
 
@@ -1727,14 +1711,14 @@
 
       const unitPatternStr = KNOWN_UNITS.join("|");
       const regexWithUnit = new RegExp(
-        `^(?:nama\\s+barang\\s+)?(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s+(${unitPatternStr})(?:\\s+(?:harga|rp|seharga|satuan))?\\s*(?:(\\d+(?:[.,]\\d+)?(?:\\s*(?:ribu|rb|k|juta|jt))?|[a-z]+(?:\\s+(?:belas|puluh|ratus|ribu|rb|juta|jt))*))?$`,
+        `^(?:nama\\s+barang\\s+)?(.+?)\\s+(\\d+(?:[.,]\\d+)?|[a-z]+(?:\\s+(?:belas|puluh|ratus))?)\\s+(${unitPatternStr})(?:\\s+(?:harga|rp|seharga|satuan))?\\s*(?:(\\d+(?:[.,]\\d+)?(?:\\s*(?:ribu|rb|k|juta|jt))?|[a-z]+(?:\\s+(?:belas|puluh|ratus|ribu|rb|juta|jt))*))?$`,
         "i"
       );
 
       const m1 = text.match(regexWithUnit);
       if (m1) {
         namaBarang = m1[1].trim();
-        qty = parseFloat(m1[2].replace(",", "."));
+        qty = indonesianWordsToNumber(m1[2]);
         satuan = normalizeUnitName(m1[3]);
         if (m1[4]) hargaSatuan = indonesianWordsToNumber(m1[4]);
       } else {
@@ -1813,7 +1797,7 @@
       recognition.onstart = () => {
         btnVoice.classList.add("listening");
         btnLabel.textContent = "Dengar...";
-        setVoiceMessage("Mendengarkan... ucapkan: <strong>nama barang, qty, satuan, harga</strong> (contoh: <em>rokok 5 bungkus 17000</em>).", true);
+        setVoiceMessage("Mendengarkan... ucapkan: <strong>nama barang, qty, satuan, harga</strong>.", true);
       };
 
       recognition.onresult = (event) => {
@@ -1979,7 +1963,7 @@
     }
 
     // =========================================================================
-    // UTILITAS FORMAT & PARSER TANGGAL
+    // UTILITAS FORMAT & PARSER TANGGAL (MENDUKUNG BERBAGAI FORMAT SHEET)
     // =========================================================================
     function showToast(msg) {
       const el = document.getElementById("toastMsg");
@@ -2029,28 +2013,17 @@
         .replace(/"/g, "&quot;");
     }
 
-    function formatDateIndo(isoOrRaw) {
-      if (!isoOrRaw) return "-";
-      const str = String(isoOrRaw).trim();
-      const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-      if (isoMatch) {
-        return `${isoMatch[3].padStart(2, "0")}/${isoMatch[2].padStart(2, "0")}/${isoMatch[1]}`;
+    function toLocalDateFromString(dateStr) {
+      if (!dateStr && dateStr !== 0) return null;
+      if (dateStr instanceof Date && !Number.isNaN(dateStr.getTime())) {
+        return new Date(dateStr.getFullYear(), dateStr.getMonth(), dateStr.getDate());
       }
-      return str;
-    }
 
-    function parseDateToObj(dateStr) {
-      if (!dateStr) return null;
-      const cleaned = String(dateStr).trim().split(" ")[0];
-      const slashMatch = cleaned.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-      if (slashMatch) {
-        const d = parseInt(slashMatch[1], 10);
-        const m = parseInt(slashMatch[2], 10) - 1;
-        const y = parseInt(slashMatch[3], 10);
-        const dt = new Date(y, m, d);
-        return Number.isNaN(dt.getTime()) ? null : dt;
-      }
-      const isoMatch = cleaned.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+      const raw = String(dateStr).trim();
+      if (!raw) return null;
+
+      // 1. Format ISO / Timestamp: YYYY-MM-DD atau YYYY-MM-DDTHH:mm:ss...
+      const isoMatch = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
       if (isoMatch) {
         const y = parseInt(isoMatch[1], 10);
         const m = parseInt(isoMatch[2], 10) - 1;
@@ -2058,11 +2031,42 @@
         const dt = new Date(y, m, d);
         return Number.isNaN(dt.getTime()) ? null : dt;
       }
+
+      // 2. Format Indonesia / Slash: DD/MM/YYYY atau DD-MM-YYYY
+      const slashMatch = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+      if (slashMatch) {
+        const d = parseInt(slashMatch[1], 10);
+        const m = parseInt(slashMatch[2], 10) - 1;
+        let y = parseInt(slashMatch[3], 10);
+        if (y < 100) y += 2000;
+        const dt = new Date(y, m, d);
+        return Number.isNaN(dt.getTime()) ? null : dt;
+      }
+
+      // 3. Fallback parse JS Date
+      const parsed = new Date(raw);
+      if (!Number.isNaN(parsed.getTime())) {
+        return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+      }
+
       return null;
     }
 
+    function formatDateIndo(isoOrRaw) {
+      const dt = toLocalDateFromString(isoOrRaw);
+      if (!dt) return isoOrRaw ? String(isoOrRaw) : "-";
+      const d = String(dt.getDate()).padStart(2, "0");
+      const m = String(dt.getMonth() + 1).padStart(2, "0");
+      const y = dt.getFullYear();
+      return `${d}/${m}/${y}`;
+    }
+
+    function parseDateToObj(dateStr) {
+      return toLocalDateFromString(dateStr);
+    }
+
     function extractMonthKey(dateStr) {
-      const dt = parseDateToObj(dateStr);
+      const dt = toLocalDateFromString(dateStr);
       if (!dt) return null;
       return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
     }
@@ -2074,10 +2078,14 @@
     }
 
     function isTodayMatch(dateStr) {
-      const todayISO = getTodayISO();
-      const todaySlash = formatDateIndo(todayISO);
-      const s = String(dateStr || "").trim();
-      return s === todayISO || s === todaySlash;
+      const dt = toLocalDateFromString(dateStr);
+      if (!dt) return false;
+      const now = new Date();
+      return (
+        dt.getFullYear() === now.getFullYear() &&
+        dt.getMonth() === now.getMonth() &&
+        dt.getDate() === now.getDate()
+      );
     }
 
     function isWithinLast7Days(dateStr) {
@@ -2091,10 +2099,10 @@
     }
 
     function normalizeTrxRow(raw, idx, source = "sheet") {
-      const namaBarang = raw.NamaBarang ?? raw.namaBarang ?? "";
-      const satuan = raw.Satuan ?? raw.satuan ?? "Pcs";
+      const namaBarang = raw.NamaBarang ?? raw.namaBarang ?? raw.namabarang ?? "";
+      const satuan = raw.Satuan ?? raw.satuan ?? raw.satuanBarang ?? "Pcs";
       const qty = parseNumber(raw.Qty ?? raw.qty);
-      const hargaSatuan = parseNumber(raw.HargaSatuan ?? raw.hargaSatuan);
+      const hargaSatuan = parseNumber(raw.HargaSatuan ?? raw.hargaSatuan ?? raw.hargasatuan);
       const jumlah = parseNumber(raw.Jumlah ?? raw.jumlah) || Math.round(qty * hargaSatuan);
       const hari = raw.Hari ?? raw.hari ?? "";
       const tanggal = raw.Tanggal ?? raw.tanggal ?? "";
@@ -2114,9 +2122,9 @@
 
     function normalizeStokRow(raw, source = "sheet") {
       return {
-        namaBarang: String(raw.NamaBarang ?? raw.namaBarang ?? "").trim(),
+        namaBarang: String(raw.NamaBarang ?? raw.namaBarang ?? raw.namabarang ?? "").trim(),
         satuan: String(raw.Satuan ?? raw.satuan ?? "Pcs").trim() || "Pcs",
-        hargaSatuan: parseNumber(raw.HargaSatuan ?? raw.hargaSatuan),
+        hargaSatuan: parseNumber(raw.HargaSatuan ?? raw.hargaSatuan ?? raw.hargasatuan),
         source
       };
     }
@@ -2165,20 +2173,24 @@
         const res = await fetch(APPS_SCRIPT_URL, { method: "GET" });
         if (!res.ok) throw new Error("Gagal mengambil data dari Apps Script");
         const json = await res.json();
-        if (!json.ok) throw new Error(json.error || "Respons Apps Script tidak valid");
+        if (json.ok === false) throw new Error(json.error || "Respons Apps Script tidak valid");
 
-        dataPemasukan = (json.pemasukan || [])
-          .filter((r) => String(r.NamaBarang ?? r.namaBarang ?? "").trim() !== "")
+        const rawIn = json.pemasukan || json.Pemasukan || [];
+        const rawOut = json.pengeluaran || json.Pengeluaran || [];
+        const rawStok = json.stokBarang || json.StokBarang || json.stok_barang || [];
+
+        dataPemasukan = rawIn
+          .filter((r) => String(r.NamaBarang ?? r.namaBarang ?? r.namabarang ?? "").trim() !== "")
           .map((r, i) => normalizeTrxRow(r, i, "sheet"))
           .reverse();
 
-        dataPengeluaran = (json.pengeluaran || [])
-          .filter((r) => String(r.NamaBarang ?? r.namaBarang ?? "").trim() !== "")
+        dataPengeluaran = rawOut
+          .filter((r) => String(r.NamaBarang ?? r.namaBarang ?? r.namabarang ?? "").trim() !== "")
           .map((r, i) => normalizeTrxRow(r, i, "sheet"))
           .reverse();
 
-        dataKatalog = (json.stokBarang || [])
-          .filter((r) => String(r.NamaBarang ?? r.namaBarang ?? "").trim() !== "")
+        dataKatalog = rawStok
+          .filter((r) => String(r.NamaBarang ?? r.namaBarang ?? r.namabarang ?? "").trim() !== "")
           .map((r) => normalizeStokRow(r, "sheet"));
 
         saveCacheToStorage();
@@ -2530,7 +2542,6 @@
       }
 
       renderCart();
-      ucapkan(`${namaBarang}, 1 ${satuan || "pcs"}`);
       showToast(`+1 ${namaBarang} masuk keranjang`);
     }
 
@@ -2568,7 +2579,6 @@
       hideQuickSuggest();
 
       renderCart();
-      ucapkan(`${namaBarang}, ${qty} ${satuan}`);
       return true;
     }
 
@@ -2713,12 +2723,6 @@
           showToast("Tersimpan di HP (cek koneksi Sheet)");
         }
 
-        ucapkan(
-          change > 0
-            ? `Transaksi berhasil. Total ${total} rupiah. Kembalian ${change} rupiah. Terima kasih.`
-            : `Transaksi berhasil. Total ${total} rupiah. Terima kasih.`
-        );
-
         clearCart();
         refreshAllViews();
         submitBtn.disabled = false;
@@ -2733,8 +2737,6 @@
         } catch (err) {
           showToast("Tersimpan di HP (cek koneksi Sheet)");
         }
-
-        ucapkan(`Pengeluaran sebesar ${total} rupiah berhasil dicatat.`);
 
         clearCart();
         refreshAllViews();
@@ -2828,7 +2830,7 @@
     }
 
     // =========================================================================
-    // MENU 5: PRINT STRUK & SEMUA TRANSAKSI SHEET (HARI, MINGGU, BULAN)
+    // MENU 5: LAPORAN STRUK & SEMUA TRANSAKSI SHEET (HARI, MINGGU, BULAN)
     // =========================================================================
     function switchPrintMode(mode) {
       printMode = mode;
