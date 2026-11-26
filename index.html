@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f3f22">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Kasir Warung &bull; Catatan Toko Kelontong</title>
+  <title>Toko Husna Ceria &bull; Catatan Toko Kelontong</title>
   <style>
     :root {
       --bg: #f1f5f9;
@@ -549,6 +549,29 @@
       cursor: pointer;
     }
 
+    .btn-print-inline {
+      width: 100%;
+      margin-top: 0.55rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: 12px;
+      border: 1.5px solid var(--primary);
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      transition: background-color 0.15s;
+    }
+
+    .btn-print-inline:active {
+      background-color: #bbf7d0;
+    }
+
     .btn-sm {
       padding: 0.35rem 0.65rem;
       font-size: 0.75rem;
@@ -703,13 +726,13 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
-      min-width: 500px;
+      font-size: 0.78rem;
+      min-width: 470px;
     }
 
     th, td {
       text-align: left;
-      padding: 0.52rem 0.6rem;
+      padding: 0.45rem 0.5rem;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
     }
@@ -721,6 +744,17 @@
       font-weight: 700;
     }
 
+    /* Tabel Laporan Kompak */
+    .compact-report-table {
+      min-width: 430px;
+      font-size: 0.74rem;
+    }
+
+    .compact-report-table th,
+    .compact-report-table td {
+      padding: 0.34rem 0.38rem;
+    }
+
     .num {
       text-align: right;
       white-space: nowrap;
@@ -729,9 +763,9 @@
 
     .badge-pill {
       display: inline-block;
-      padding: 0.15rem 0.45rem;
-      border-radius: 6px;
-      font-size: 0.7rem;
+      padding: 0.12rem 0.4rem;
+      border-radius: 5px;
+      font-size: 0.68rem;
       font-weight: 700;
     }
 
@@ -818,30 +852,52 @@
     .report-summary-strip {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
+      gap: 0.45rem;
+      margin-bottom: 0.45rem;
     }
 
     .report-pill {
       background-color: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 0.55rem 0.7rem;
+      padding: 0.5rem 0.65rem;
     }
 
     .report-pill-lbl {
-      font-size: 0.7rem;
+      font-size: 0.69rem;
       color: var(--muted);
     }
 
     .report-pill-val {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       color: var(--primary);
       font-variant-numeric: tabular-nums;
     }
 
     .report-pill.out .report-pill-val {
+      color: var(--danger-text);
+    }
+
+    /* Kotak Laba / Rugi */
+    .profit-loss-banner {
+      border-radius: 10px;
+      padding: 0.52rem 0.75rem;
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 800;
+      border: 1px solid var(--info-border);
+      background-color: var(--info-bg);
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .profit-loss-banner.rugi {
+      border-color: var(--danger-border);
+      background-color: var(--danger-bg);
       color: var(--danger-text);
     }
 
@@ -962,10 +1018,14 @@
       display: none !important;
     }
 
-    /* Print Styles */
+    /* Print Styles - Kolom Kompak agar Muat Banyak dalam 1 Lembar */
     @media print {
+      @page {
+        margin: 8mm;
+      }
       body {
         background: #ffffff;
+        line-height: 1.25;
       }
       .app-shell {
         box-shadow: none;
@@ -988,6 +1048,7 @@
         border: none;
         box-shadow: none;
         padding: 0;
+        margin: 0;
       }
       .receipt-paper {
         border: none;
@@ -996,13 +1057,50 @@
         margin: 0 auto;
         padding: 0;
       }
+      .report-summary-strip {
+        gap: 6px;
+        margin-bottom: 5px;
+      }
+      .report-pill {
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+      .report-pill-lbl {
+        font-size: 8.5px;
+      }
+      .report-pill-val {
+        font-size: 10.5px;
+      }
+      .profit-loss-banner {
+        padding: 4px 8px;
+        margin-bottom: 6px;
+        font-size: 10px;
+        border-radius: 6px;
+      }
       .table-wrap {
         overflow: visible;
-        border: none;
+        border: 1px solid #cbd5e1;
+        border-radius: 0;
       }
-      table {
+      table,
+      .compact-report-table {
+        width: 100%;
         min-width: 100%;
-        font-size: 0.75rem;
+        font-size: 9px;
+        table-layout: auto;
+      }
+      .compact-report-table th,
+      .compact-report-table td {
+        padding: 2px 3.5px;
+        border-bottom: 1px solid #cbd5e1;
+        line-height: 1.2;
+      }
+      .compact-report-table th {
+        font-size: 8.5px;
+      }
+      .compact-report-table .badge-pill {
+        padding: 0 3px;
+        font-size: 8px;
       }
     }
   </style>
@@ -1021,7 +1119,7 @@
           </svg>
         </div>
         <div>
-          <div class="topbar-title">Kasir Warung</div>
+          <div class="topbar-title">Toko Husna Ceria</div>
           <div class="topbar-sub" id="topbarDateSub">Catatan Warung &bull; 24 Jam</div>
         </div>
       </div>
@@ -1038,7 +1136,7 @@
     <div id="view-home" class="app-view active">
       <div class="hero-wallet">
         <div class="wallet-label">
-          <span>Sisa Saldo Kas Warung</span>
+          <span>Sisa Saldo Kas Toko Husna Ceria</span>
           <span>IDR</span>
         </div>
         <div class="wallet-saldo" id="heroSaldo">Rp 0</div>
@@ -1063,7 +1161,7 @@
           <h2 class="card-title">Grafik Pemasukan Harian</h2>
           <span style="font-size:0.72rem; font-weight:700; color:var(--primary);">7 Hari</span>
         </div>
-        <div class="daily-chart-sub">Total penjualan harian kas warung (Rp)</div>
+        <div class="daily-chart-sub">Total penjualan harian Toko Husna Ceria (Rp)</div>
 
         <div class="bar-chart-scroll">
           <div class="bar-chart-stage" id="homeDailyChart"></div>
@@ -1128,7 +1226,7 @@
     </div>
 
     <!-- =========================================================
-         MENU 3: TRANSAKSI (TOMBOL TENGAH MENONJOL + SUARA)
+         MENU 3: TRANSAKSI (TOMBOL TENGAH MENONJOL + SUARA + PRINT)
     ========================================================== -->
     <div id="view-transaksi" class="app-view">
       <div class="app-card">
@@ -1238,6 +1336,13 @@
         <button type="button" class="btn-primary" id="btnSubmitTrx" onclick="submitTransaction()">
           Simpan Transaksi ke Sheet
         </button>
+
+        <button type="button" class="btn-print-inline" onclick="printCurrentCartReceipt()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          <span>Print Struk Daftar Belanja</span>
+        </button>
       </div>
     </div>
 
@@ -1323,7 +1428,7 @@
 
           <div class="receipt-paper" id="receiptPaper">
             <div class="receipt-center">
-              <div style="font-weight:800; font-size:0.95rem;">WARUNG KELONTONG</div>
+              <div style="font-weight:800; font-size:0.95rem;">TOKO HUSNA CERIA</div>
               <div style="font-size:0.72rem;">Catatan Harian &amp; Kasir Toko</div>
               <div style="font-size:0.72rem;" id="rcpDate">-</div>
             </div>
@@ -1402,8 +1507,8 @@
             <input type="search" class="form-control" id="printSearchInput" placeholder="Cari nama barang di seluruh riwayat..." oninput="renderPrintLaporan()">
           </div>
 
-          <div style="margin-bottom:0.6rem;">
-            <div style="font-size:0.88rem; font-weight:800; color:var(--primary);" id="printReportHeading">Laporan Semua Transaksi Warung</div>
+          <div style="margin-bottom:0.55rem;">
+            <div style="font-size:0.88rem; font-weight:800; color:var(--primary);" id="printReportHeading">Laporan Semua Transaksi Toko Husna Ceria</div>
             <div style="font-size:0.74rem; color:var(--muted);" id="printReportSub">-</div>
           </div>
 
@@ -1418,19 +1523,24 @@
             </div>
           </div>
 
+          <div class="profit-loss-banner" id="printProfitLossBox">
+            <span id="printProfitLossLabel">Laba</span>
+            <span id="printProfitLossVal">Rp 0</span>
+          </div>
+
           <div class="table-wrap" style="margin-bottom:0.85rem;">
-            <table>
+            <table class="compact-report-table">
               <thead>
                 <tr>
-                  <th>No</th>
-                  <th>Tipe</th>
-                  <th>NamaBarang</th>
-                  <th>Satuan</th>
-                  <th class="num">Qty</th>
-                  <th class="num">Harga</th>
-                  <th class="num">Jumlah</th>
-                  <th>Hari</th>
-                  <th>Tanggal</th>
+                  <th style="width:24px;">No</th>
+                  <th style="width:44px;">Tipe</th>
+                  <th>Nama Barang</th>
+                  <th style="width:44px;">Sat</th>
+                  <th class="num" style="width:32px;">Qty</th>
+                  <th class="num" style="width:62px;">Hrg</th>
+                  <th class="num" style="width:68px;">Jml</th>
+                  <th style="width:46px;">Hari</th>
+                  <th style="width:64px;">Tgl</th>
                 </tr>
               </thead>
               <tbody id="printLaporanBody"></tbody>
@@ -2022,7 +2132,6 @@
       const raw = String(dateStr).trim();
       if (!raw) return null;
 
-      // 1. Format ISO / Timestamp: YYYY-MM-DD atau YYYY-MM-DDTHH:mm:ss...
       const isoMatch = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
       if (isoMatch) {
         const y = parseInt(isoMatch[1], 10);
@@ -2032,7 +2141,6 @@
         return Number.isNaN(dt.getTime()) ? null : dt;
       }
 
-      // 2. Format Indonesia / Slash: DD/MM/YYYY atau DD-MM-YYYY
       const slashMatch = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
       if (slashMatch) {
         const d = parseInt(slashMatch[1], 10);
@@ -2043,7 +2151,6 @@
         return Number.isNaN(dt.getTime()) ? null : dt;
       }
 
-      // 3. Fallback parse JS Date
       const parsed = new Date(raw);
       if (!Number.isNaN(parsed.getTime())) {
         return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
@@ -2399,7 +2506,7 @@
     }
 
     // =========================================================================
-    // MENU 3: TRANSAKSI KASIR, AKSI CEPAT & PENGELUARAN
+    // MENU 3: TRANSAKSI KASIR, AKSI CEPAT, PENGELUARAN & PRINT DAFTAR BELANJA
     // =========================================================================
     function initDefaultDateAndDay() {
       const todayISO = getTodayISO();
@@ -2657,6 +2764,80 @@
         .join("");
 
       calculateChange();
+    }
+
+    function printCurrentCartReceipt() {
+      const pendingName = document.getElementById("trxCatalogSelect").value.trim();
+      if (pendingName) {
+        addItemToCart();
+      }
+
+      if (cartItems.length > 0) {
+        const hari = document.getElementById("trxHari").value.trim() || HARI_ID[new Date().getDay()];
+        const tanggalISO = document.getElementById("trxTanggal").value || getTodayISO();
+        const tanggalFormatted = formatDateIndo(tanggalISO);
+        const total = getCartTotal();
+        const cashInput = parseNumber(document.getElementById("trxCashReceived").value);
+        const cashReceived = cashInput > 0 ? cashInput : total;
+        const change = Math.max(0, cashReceived - total);
+
+        const draftReceipt = {
+          id: "DRAFT-" + Date.now(),
+          hari,
+          tanggal: tanggalFormatted,
+          waktu: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+          items: cartItems.map((it) => ({ ...it })),
+          total,
+          cash: cashReceived,
+          change
+        };
+
+        switchAppView("print");
+        switchPrintMode("struk");
+
+        const select = document.getElementById("printReceiptSelect");
+        const opt = document.createElement("option");
+        opt.value = "draft-cart";
+        opt.textContent = `Daftar Belanja Saat Ini — ${formatRupiah(total)}`;
+        select.insertBefore(opt, select.firstChild);
+        select.value = "draft-cart";
+
+        document.getElementById("rcpDate").textContent =
+          `${draftReceipt.hari}, ${draftReceipt.tanggal} ${draftReceipt.waktu}`;
+        document.getElementById("rcpItems").innerHTML = draftReceipt.items
+          .map(
+            (it) => `
+            <div style="margin-bottom:0.35rem;">
+              <div>${escapeHTML(it.namaBarang)}</div>
+              <div class="receipt-row" style="font-size:0.75rem;">
+                <span>${it.qty} ${escapeHTML(it.satuan)} x ${formatRupiah(it.hargaSatuan)}</span>
+                <span>${formatRupiah(it.jumlah)}</span>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+
+        document.getElementById("rcpTotal").textContent = formatRupiah(draftReceipt.total);
+        document.getElementById("rcpCash").textContent = formatRupiah(draftReceipt.cash);
+        document.getElementById("rcpChange").textContent = formatRupiah(draftReceipt.change);
+        document.getElementById("rcpCashRow").classList.remove("hidden");
+        document.getElementById("rcpChangeRow").classList.remove("hidden");
+
+        setTimeout(() => window.print(), 180);
+        return;
+      }
+
+      if (savedReceipts.length > 0) {
+        switchAppView("print");
+        switchPrintMode("struk");
+        document.getElementById("printReceiptSelect").value = "rcp-0";
+        renderReceiptPreview();
+        setTimeout(() => window.print(), 180);
+        return;
+      }
+
+      showToast("Daftar belanja masih kosong!");
     }
 
     async function submitTransaction() {
@@ -3011,6 +3192,22 @@
       document.getElementById("printSumIn").textContent = formatRupiah(sumIn);
       document.getElementById("printSumOut").textContent = formatRupiah(sumOut);
 
+      // Hitung Laba / Rugi (selisih Pemasukan - Pengeluaran)
+      const selisih = sumIn - sumOut;
+      const plBox = document.getElementById("printProfitLossBox");
+      const plLabel = document.getElementById("printProfitLossLabel");
+      const plVal = document.getElementById("printProfitLossVal");
+
+      if (selisih >= 0) {
+        plBox.classList.remove("rugi");
+        plLabel.textContent = "Laba";
+        plVal.textContent = formatRupiah(selisih);
+      } else {
+        plBox.classList.add("rugi");
+        plLabel.textContent = "Rugi";
+        plVal.textContent = formatRupiah(Math.abs(selisih));
+      }
+
       const labelParts = [];
       if (periode === "hari_ini") labelParts.push("Hari Ini");
       else if (periode === "minggu_ini") labelParts.push("Minggu Ini (7 Hari)");
@@ -3019,12 +3216,12 @@
       if (bulanVal) labelParts.push("Bulan: " + formatMonthLabel(bulanVal));
 
       document.getElementById("printReportSub").textContent =
-        `${labelParts.join(" • ")} (${filtered.length} transaksi)`;
+        `${labelParts.join(" • ")} (${filtered.length} item)`;
 
       const tbody = document.getElementById("printLaporanBody");
       if (filtered.length === 0) {
         tbody.innerHTML =
-          '<tr><td colspan="9" style="text-align:center; padding:16px;">Tidak ada data transaksi pada filter ini.</td></tr>';
+          '<tr><td colspan="9" style="text-align:center; padding:16px;">Tidak ada data item pada filter ini.</td></tr>';
         return;
       }
 
